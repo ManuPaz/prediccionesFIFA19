@@ -1,0 +1,104 @@
+preprocessing:
+   #  preprocesado que se puede generalizar a otros dataframes
+   # columnas en las que hay que eliminar o sustituir simbolos
+   symbol_columns : {"Wage": [["€", ""], ["K", "000"]],
+                      "Value": [["€", ""], ["K", "000"], ["M", "000000"]],
+                      "ReleaseClause": [["€", ""], ["K", "000"], ["M", "000000"]],
+                      }
+   # columnas para eliminar
+   columns_drop : ["Unnamed:0"]
+   #conversion de Unidades
+   #para altura dos factores: pies a metros y pulgadas a metros, para ancho un factor: libras a kg
+   unidades_conversion: {"Height": { "separador": "'", "factor_conv1": 0.3048, "factor_conv2": 0.0254 },
+                       "Weight": { "unidad": "lbs", "factor_conv": 0.4536 } }
+
+
+#variables que se van a utilizar para predecir cada feature
+variables_predictoras:
+  Wage: ["InternationalReputation", "Reactions", "Overall",
+                "Composure", "BallControl", "GKPositioning",
+                "ShortPassing", "Interceptions", "Finishing",
+                "GKKicking", "HeadingAccuracy", "SkillMoves",
+                "LongPassing", "GKHandling", "Vision",
+                "GKReflexes", "GKDiving", "Dribbling",
+                ]
+
+  PositionGrouped: ["BallControl", "Penalties", "GKPositioning",
+  "SlidingTackle", "StandingTackle", "Marking",
+  "ShortPassing", "Jumping", "Interceptions",
+  "Finishing" ,"GKKicking" ,"HeadingAccuracy",
+  "Aggression" ,"LongPassing", "GKHandling",
+  "Volleys" ,"Vision" ,"LongShots" ,"GKReflexes",
+  "GKDiving" ,"Positioning"]
+
+  todas: ["InternationalReputation", "Reactions", "Overall",
+  "BallControl", "Penalties", "GKPositioning",
+  "SlidingTackle", "StandingTackle", "Marking",
+  "ShortPassing", "Jumping", "Interceptions",
+  "Finishing", "GKKicking", "HeadingAccuracy",
+  "Aggression", "LongPassing", "GKHandling",
+  "Volleys", "Vision", "LongShots",
+  "GKReflexes", "GKDiving", "Positioning",
+  "SkillMoves" ,"Dribbling" ,"FKAccuracy",
+  "Marking" ,"Balance" ,"Curve" ,"Acceleration",
+  "Crossing", "Stamina", "Agility" ,"ShotPower",
+  "SprintSpeed" ,"Strength"
+  ]
+  Value: [ "InternationalReputation", "Reactions", "Overall",
+           "BallControl", "Penalties", "GKPositioning",
+           "SlidingTackle", "StandingTackle", "Marking",
+           "ShortPassing", "Jumping", "Interceptions",
+           "Finishing", "GKKicking", "HeadingAccuracy",
+           "Aggression", "LongPassing", "GKHandling",
+           "Volleys", "Vision", "LongShots",
+           "GKReflexes", "GKDiving", "Positioning",
+           "SkillMoves" ,"Dribbling" ,"FKAccuracy",
+           "Marking" ,"Balance" ,"Curve" ,"Acceleration",
+           "Crossing", "Stamina", "Agility" ,"ShotPower",
+           "SprintSpeed" ,"Strength"
+  ]
+
+
+
+entrenamiento:
+
+  # variable que se quiere predecir
+  feature: "PositionGrouped"
+  #parametros de entrenamiento para los diferentes modelos
+  train_test_split: 0.7
+  search: "random" #grid o random
+  cv : 10
+  random_search:
+     n_iter : 10
+
+  param_tunning:
+    decision_tree:
+      # minimo, maximo y step
+      max_depth : [1,20,1] # default None
+      min_samples_split : [5, 100, 1] # default 2
+    random_forest:
+      max_depth: [ 1,20,1 ] # minimo, maximo y step
+      min_samples_split: [ 5, 100, 1 ]
+      n_estimators: [5,20,1]
+    linear_SVC:
+      C: [0.1, 5, 0.5]
+    gradient_boosting:
+      max_depth: [ 1,20,1 ] #default 3
+      n_estimators: [20,200,1] #default 100
+      learning_rate: [0.001, 1, 0.005] #default 0.1
+    ada_boosting: #por defecto usa como estimador base decission tree con max_depth=1
+        n_estimators: [ 5,80,1 ] # default 50
+        learning_rate: [ 0.001, 1, 0.005 ] #default 1
+    k_neighbors:
+      n_neighbors: [1,100,5]
+      weights: ["uniform", "distance"]
+      metric: ["minkowski"]
+
+
+  params:
+    linear_SVC:
+      multi_class: "ovr" #one vs rest, la otra opcion es crammer_singer
+    logistic_regression:
+      multi_class: "ovr"
+
+

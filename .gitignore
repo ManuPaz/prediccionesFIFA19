@@ -45,7 +45,9 @@
 # .idea/modules
 # *.iml
 # *.ipr
-
+#logs
+*/logs.txt
+*/logsTraining.txt
 # CMake
 cmake-build-*/
 

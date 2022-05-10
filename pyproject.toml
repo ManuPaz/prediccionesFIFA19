@@ -6,6 +6,10 @@ authors = ["manuel <manu.paz.pintor@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+numpy = "^1.22.3"
+pandas = "^1.4.2"
+pyYAML = "^6.0"
+scikit-learn  = "^1.0.2"
 
 [tool.poetry.dev-dependencies]
 
