@@ -83,12 +83,3 @@ class Classifier_HyperParameterTuning():
 
 
 
-def LinearDiscriminantClassify(X_train, y_train, X_test, y_test):
-    clf = LinearDiscriminantAnalysis()
-    y_pred = clf.predict(X_test)
-    p = precision_score(y_test, y_pred, average="macro")
-    r = recall_score(y_test, y_pred, average="macro")
-    f1 = f1_score(y_test, y_pred, average="macro")
-    ac = accuracy_score(y_test, y_pred)
-    params = {}
-    return clf, p, r, f1, ac, params

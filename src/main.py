@@ -17,7 +17,7 @@ if __name__ == '__main__':
     X = df.loc[:, columnas]
     y=df.loc[:,feature]
     X_train, X_test, y_train, y_test=machine_learninge_utils.get_train_test(X, y, train_size=size, shuffle=False)
-    a=machine_learning_classification.Classifier_HyperParameterTuning("k_neighbors")
+    a=machine_learning_classification.Classifier_HyperParameterTuning("lda")
     y_pred=a.fit_predict(X_train, y_train, X_test, y_test)
     metricas=a.metrics(y_test, y_pred)
     print(metricas)
