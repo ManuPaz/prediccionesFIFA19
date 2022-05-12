@@ -48,6 +48,9 @@
 #logs
 */logs.txt
 */logsTraining.txt
+*/logsForecasting.txt
+*/modelosFinales/*
+*/pruebasModelos/*
 # CMake
 cmake-build-*/
 

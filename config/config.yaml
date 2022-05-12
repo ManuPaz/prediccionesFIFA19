@@ -1,48 +1,55 @@
 preprocessing:
-   #  preprocesado que se puede generalizar a otros dataframes
-   # columnas en las que hay que eliminar o sustituir simbolos
-   symbol_columns : {"Wage": [["€", ""], ["K", "000"]],
-                      "Value": [["€", ""], ["K", "000"], ["M", "000000"]],
-                      "ReleaseClause": [["€", ""], ["K", "000"], ["M", "000000"]],
-                      }
-   # columnas para eliminar
-   columns_drop : ["Unnamed:0"]
-   #conversion de Unidades
-   #para altura dos factores: pies a metros y pulgadas a metros, para ancho un factor: libras a kg
-   unidades_conversion: {"Height": { "separador": "'", "factor_conv1": 0.3048, "factor_conv2": 0.0254 },
-                       "Weight": { "unidad": "lbs", "factor_conv": 0.4536 } }
+  #  preprocesado que se puede generalizar a otros dataframes
+  # columnas en las que hay que eliminar o sustituir simbolos
+  symbol_columns: { "Wage": [ [ "€", "" ], [ "K", "000" ] ],
+                    "Value": [ [ "€", "" ], [ "K", "000" ], [ "M", "000000" ] ],
+                    "ReleaseClause": [ [ "€", "" ], [ "K", "000" ], [ "M", "000000" ] ],
+  }
+  # columnas para eliminar
+  columns_drop: [ "Unnamed:0" ]
+  #conversion de Unidades
+  #para altura dos factores: pies a metros y pulgadas a metros, para ancho un factor: libras a kg
+  unidades_conversion: { "Height": { "separador": "'", "factor_conv1": 0.3048, "factor_conv2": 0.0254 },
+                         "Weight": { "unidad": "lbs", "factor_conv": 0.4536 } }
 
 
 #variables que se van a utilizar para predecir cada feature
 variables_predictoras:
-  Wage: ["InternationalReputation", "Reactions", "Overall",
-                "Composure", "BallControl", "GKPositioning",
-                "ShortPassing", "Interceptions", "Finishing",
-                "GKKicking", "HeadingAccuracy", "SkillMoves",
-                "LongPassing", "GKHandling", "Vision",
-                "GKReflexes", "GKDiving", "Dribbling",
-                ]
+  Wage: [ "InternationalReputation", "Reactions",
+          "Composure", "BallControl", "GKPositioning",
+          "ShortPassing", "Interceptions", "Finishing",
+          "GKKicking", "HeadingAccuracy", "SkillMoves",
+          "LongPassing", "GKHandling", "Vision",
+          "GKReflexes", "GKDiving", "Dribbling",
+  ]
 
-  PositionGrouped: ["BallControl", "Penalties", "GKPositioning",
-  "SlidingTackle", "StandingTackle", "Marking",
-  "ShortPassing", "Jumping", "Interceptions",
-  "Finishing" ,"GKKicking" ,"HeadingAccuracy",
-  "Aggression" ,"LongPassing", "GKHandling",
-  "Volleys" ,"Vision" ,"LongShots" ,"GKReflexes",
-  "GKDiving" ,"Positioning"]
+  PositionGrouped: [ "BallControl", "Penalties", "GKPositioning",
+                     "SlidingTackle", "StandingTackle", "Marking",
+                     "ShortPassing", "Jumping", "Interceptions",
+                     "Finishing" ,"GKKicking" ,"HeadingAccuracy",
+                     "Aggression" ,"LongPassing", "GKHandling",
+                     "Volleys" ,"Vision" ,"LongShots" ,"GKReflexes",
+                     "GKDiving" ,"Positioning" ]
+  Position: [ "BallControl", "Penalties", "GKPositioning",
+                     "SlidingTackle", "StandingTackle", "Marking",
+                     "ShortPassing", "Jumping", "Interceptions",
+                     "Finishing" ,"GKKicking" ,"HeadingAccuracy",
+                     "Aggression" ,"LongPassing", "GKHandling",
+                     "Volleys" ,"Vision" ,"LongShots" ,"GKReflexes",
+                     "GKDiving" ,"Positioning" ]
 
-  todas: ["InternationalReputation", "Reactions", "Overall",
-  "BallControl", "Penalties", "GKPositioning",
-  "SlidingTackle", "StandingTackle", "Marking",
-  "ShortPassing", "Jumping", "Interceptions",
-  "Finishing", "GKKicking", "HeadingAccuracy",
-  "Aggression", "LongPassing", "GKHandling",
-  "Volleys", "Vision", "LongShots",
-  "GKReflexes", "GKDiving", "Positioning",
-  "SkillMoves" ,"Dribbling" ,"FKAccuracy",
-  "Marking" ,"Balance" ,"Curve" ,"Acceleration",
-  "Crossing", "Stamina", "Agility" ,"ShotPower",
-  "SprintSpeed" ,"Strength"
+  todas: [ "InternationalReputation", "Reactions", "Overall",
+           "BallControl", "Penalties", "GKPositioning",
+           "SlidingTackle", "StandingTackle", "Marking",
+           "ShortPassing", "Jumping", "Interceptions",
+           "Finishing", "GKKicking", "HeadingAccuracy",
+           "Aggression", "LongPassing", "GKHandling",
+           "Volleys", "Vision", "LongShots",
+           "GKReflexes", "GKDiving", "Positioning",
+           "SkillMoves" ,"Dribbling" ,"FKAccuracy",
+           "Marking" ,"Balance" ,"Curve" ,"Acceleration",
+           "Crossing", "Stamina", "Agility" ,"ShotPower",
+           "SprintSpeed" ,"Strength"
   ]
   Value: [ "InternationalReputation", "Reactions", "Overall",
            "BallControl", "Penalties", "GKPositioning",
@@ -59,46 +66,96 @@ variables_predictoras:
   ]
 
 
+forecasting:
+  todos_los_modelos: False #mostrar las predicciones con todos los modelos o solo el mejor
 
 entrenamiento:
 
-  # variable que se quiere predecir
-  feature: "PositionGrouped"
-  #parametros de entrenamiento para los diferentes modelos
-  train_test_split: 0.7
-  search: "random" #grid o random
-  cv : 10
-  random_search:
-     n_iter : 10
+  plot: True #variable para hacer plots o no durante el entrenamiento
 
-  param_tunning:
-    decision_tree:
-      # minimo, maximo y step
-      max_depth : [1,20,1] # default None
-      min_samples_split : [5, 100, 1] # default 2
-    random_forest:
-      max_depth: [ 1,20,1 ] # minimo, maximo y step
-      min_samples_split: [ 5, 100, 1 ]
-      n_estimators: [5,20,1]
-    linear_SVC:
-      C: [0.1, 5, 0.5]
-    gradient_boosting:
-      max_depth: [ 1,20,1 ] #default 3
-      n_estimators: [20,200,1] #default 100
-      learning_rate: [0.001, 1, 0.005] #default 0.1
-    ada_boosting: #por defecto usa como estimador base decission tree con max_depth=1
+  reducir_dimensionalidad: False #usar pca para reducir la dimensionalidad
+  optimizar: True
+  feature_clasificacion: "PositionGrouped"  # variable que se quiere predecir con el modelo de clasificacion
+
+  feature_regresion: "Wage"  #variable que se quiere predecir con el modelo de regresion
+
+  train_test_split: 0.7
+  search: "random"  #tipo de busqueda si se hace optmizacion, grid o random
+  cv: 10 # numero de grupos de cross validation
+  random_search:
+    n_iter: 10 #numero de combinaciones del espacio parametrico utilizadas si se hace random search
+  classification:
+    multi_class_score: "micro" #forma de computar las metricas con multi clase. Micro agrega todas las clases
+                                #y macro calcula clase a clase y hace la media
+    modelos : [ "random_forest",
+                "gradient_boosting", "ada_boosting",
+               "linear_SVC", "logistic",
+                "k_neighbors", "lda" ]
+
+    todos: [ "random_forest",
+               "gradient_boosting", "ada_boosting",
+               "linear_SVC", "logistic",
+               "k_neighbors", "lda" ]
+    param_tunning:
+      decision_tree:
+        # minimo, maximo y step
+        max_depth: [ 1,20,1 ] # default None
+        min_samples_split: [ 5, 100, 1 ] # default 2
+      random_forest:
+        max_depth: [ 1,20,3 ] # minimo, maximo y step
+        min_samples_split: [ 2, 100, 10]
+        n_estimators: [ 5,20,2 ]
+      linear_SVC:
+        C: [ 0.1, 5, 0.5 ]
+      gradient_boosting:
+        max_depth: [ 1,20,1 ] #default 3
+        n_estimators: [ 20,200,1 ] #default 100
+        learning_rate: [ 0.001, 1, 0.005 ] #default 0.1
+      ada_boosting: #por defecto usa como estimador base decission tree con max_depth=1
         n_estimators: [ 5,80,1 ] # default 50
         learning_rate: [ 0.001, 1, 0.005 ] #default 1
-    k_neighbors:
-      n_neighbors: [1,100,5]
-      weights: ["uniform", "distance"]
-      metric: ["minkowski"]
+      k_neighbors:
+        n_neighbors: [ 5,100,20 ]
+        weights: [ "uniform","distance" ]
+        metric: [ "minkowski" ]
+    params:
+        linear_SVC:
+          multi_class: "ovr" #one vs rest, la otra opcion es crammer_singer
+        logistic:
+          multi_class: "ovr"
+
+  regression:
+    transformacion_logaritmica: False
+    modelos: [ "random_forest","SVR","gradient_boosting"]
+
+    todos: [ "ridge", "lasso", "linear",
+               "k_neighbors", "random_forest",
+               "gradient_boosting","linear_SVR",
+          "logistic","elastic_net","SVR"]
+
+  #configuracion para la optimizacion de parametros
+    param_tunning:
+
+      k_neighbors:
+        n_neighbors: [ 23,53,10 ]
+        weights: [ "uniform" ]
+      random_forest:
+        max_depth: [ 1,20,5 ] # minimo, maximo y step
+        min_samples_split: [ 1, 100, 15 ]
+        n_estimators: [ 5,20,1 ]
+      gradient_boosting:
+        max_depth: [ 1,20,1 ] #default 3
+        n_estimators: [ 20,200,1 ] #default 100
+        learning_rate: [ 0.001, 1, 0.005 ] #default 0.1
+      linear_SVR:
+        C: [ 20, 50, 5 ]
+    params:
+      k_neighbors:
+          metric: "minkowski"
 
 
-  params:
-    linear_SVC:
-      multi_class: "ovr" #one vs rest, la otra opcion es crammer_singer
-    logistic_regression:
-      multi_class: "ovr"
+
+
+
 
 

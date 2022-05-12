@@ -108,6 +108,7 @@ def read_csv(nombre_archivo: str, symbols_columns: dict, columnas_drop: list, ch
     dataframe = __deleteSymbols(dataframe, symbols_columns, columnas_drop)
     dataframe = __change_UNITS(dataframe, change_units)
     dataframe= __posiciones(dataframe)
+    dataframe = dataframe.set_index("Name")
     return dataframe
 
 
