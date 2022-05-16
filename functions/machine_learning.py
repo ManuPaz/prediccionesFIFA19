@@ -166,7 +166,9 @@ class HyperParameterTuning():
         """
         return self.__dimension_reduction
 
-
+    @property
+    def jugadores_train(self):
+        return self.__jugadores_train
     @modelo.setter
     def modelo(self,modelo):
         self.__modelo=modelo
@@ -296,6 +298,9 @@ class HyperParameterTuning():
         self.__X_test = X_test
         self.__y_train= y_train
         self.__y_test = y_test
+
+        #guardamos los nombres de los jugadores del train set
+        self.__jugadores_train= self.__X_train.index
 
         if self.normalize_X:
             self.__X_train = self.standar_scaler_X.fit_transform(self.__X_train)

@@ -78,7 +78,7 @@ entrenamiento:
   random_seed: 20
   reducir_dimensionalidad: False #usar pca para reducir la dimensionalidad
   optimizar: False
-  feature_clasificacion: "PositionSinLado"  # variable que se quiere predecir con el modelo de clasificacion
+  feature_clasificacion: "Position"  # variable que se quiere predecir con el modelo de clasificacion
 
   feature_regresion: "Value"  #variable que se quiere predecir con el modelo de regresion
 

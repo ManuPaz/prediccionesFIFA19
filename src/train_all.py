@@ -14,7 +14,7 @@ logger = logging.getLogger('training')
 
 if __name__ == '__main__':
     config = load_config.config()
-    df = pd.read_csv("../data/preprocesed/dataFIFA.csv")
+    df = pd.read_csv("../data/preprocesed/dataFIFA.csv",index_col=0)
 
     features_tipo = {
         #"Wage": machine_learning.Regresor,

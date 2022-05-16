@@ -16,7 +16,7 @@ pd.set_option('display.width', 1000)
 
 if __name__ == '__main__':
     config = load_config.config()
-    df = pd.read_csv("../data/preprocesed/dataFIFA.csv")
+    df = pd.read_csv("../data/preprocesed/dataFIFA.csv",index_col=0)
     nombre_modelo="random_forest"
     feature =config["entrenamiento"]["feature_clasificacion"]
 
