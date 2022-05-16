@@ -31,8 +31,7 @@ if __name__ == '__main__':
     print( modelo_encapsulado.metrics())
     modelo_encapsulado.predict(X_train,y_train)
     print(modelo_encapsulado.metrics())
-    modelo_encapsulado.predict(X_test,y_test)
-    print(modelo_encapsulado.metrics())
+
     with open("../assets/modelosFinales/" + feature + "_" + nombre_modelo, 'wb') as handle:
         pickle.dump(modelo_encapsulado, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
