@@ -16,7 +16,7 @@ def get_train_test(X, y, train_size =0.7, shuffle=False):
 
 def parameter_search(modelo, param_grid, X_train, y_train,scorer,n_iter=10,cv=10,tipo="random"):
     """
-
+    Optmizacion de parametros
     :param modelo: modelo de sklearn
     :param param_grid: espacio de parametros
     :param X_train:

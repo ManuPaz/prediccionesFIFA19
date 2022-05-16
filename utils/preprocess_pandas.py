@@ -1,21 +1,37 @@
+import numpy as np
 import pandas as pd
 from config import load_config
 import logging.config
 pd.options.mode.chained_assignment = None
-
-
-def __deleteSymbols(df, symbols_columns: dict, columnsDrop: list):
+from sklearn.preprocessing import OrdinalEncoder
+def calcularDinero(x):
+    if not type(x)==float:
+        if x[-1]=="K":
+            return 1000*float(x[:-1])
+        elif x[-1]=="M":
+            return 1000000*float(x[:-1])
+        else:
+            return float(x)
+    else:
+        return x
+def __deleteSymbols(df,columnsDrop: list):
     df.columns = [c.replace(' ', '') for c in df.columns]
     for column in columnsDrop:
         df.drop(column, axis=1, inplace=True)
 
-    for clave, replacement in symbols_columns.items():
-        for e in replacement:
-            df[clave] = df[clave].str.replace(e[0], e[1])
-        df[clave] = df[clave].astype(float)
+    for clave in ["Wage","Value","ReleaseClause"]:
+
+            df[clave] = df[clave].str.replace("€","")
+            df[clave] = df[clave].map(lambda x:calcularDinero(x))
+
     return df
 
-
+def to_numeric(df):
+    df["PreferredFoot"]=df["PreferredFoot"].transform(lambda x: 1 if x=="Right" else 0).astype(float)
+    ord_enc = OrdinalEncoder()
+    df["BodyType"]=ord_enc.fit_transform(df[["BodyType"]])
+    df["libre"]=df["Club"].transform(lambda x: 1 if  not pd.isnull(x)   else 0)
+    return df
 def __change_UNITS(df, change_units: dict):
 
     for columna, unidades in change_units.items():
@@ -97,18 +113,51 @@ def __posiciones(df):
     posicionesGrupos["RB"] = "D"
     posicionesGrupos["LDM"] = "M"
     posicionesGrupos["RDM"] = "M"
+    posicionesSinLado = {}
+    posicionesSinLado["GK"] = "P"
+    posicionesSinLado["EB"] = "E"
+    posicionesSinLado["RWB"] = "WB"
+    posicionesSinLado["LWB"] = "WB"
+    posicionesSinLado["LF"] = "F"
+    posicionesSinLado["CB"] = "CB"
+    posicionesSinLado["CDM"] = "CDM"
+    posicionesSinLado["RM"] = "M"
+    posicionesSinLado["CM"] = "CM"
+    posicionesSinLado["LM"] = "M"
+    posicionesSinLado["CAM"] = "CAM"
+    posicionesSinLado["RF"] = "F"
+    posicionesSinLado["LF"] = "F"
+    posicionesSinLado["CF"] = "CF"
+    posicionesSinLado["RW"] = "W"
+    posicionesSinLado["LW"] = "W"
+    posicionesSinLado["ST"] = "ST"
+    posicionesSinLado["LAM"] = "LAM"
+    posicionesSinLado["LB"] = "CB"
+    posicionesSinLado["LCB"] = "CB"
+    posicionesSinLado["LCM"] = "CM"
+    posicionesSinLado["RAM"] = "AM"
+    posicionesSinLado["LAM"] = "AM"
+    posicionesSinLado["RCM"] = "CM"
+    posicionesSinLado["RCB"] = "CB"
+    posicionesSinLado["LS"] = "S"
+    posicionesSinLado["RS"] = "S"
+    posicionesSinLado["RB"] = "CB"
+    posicionesSinLado["LDM"] = "DM"
+    posicionesSinLado["RDM"] = "DM"
     df = df.dropna(subset=['Position'])
     df.tail()
     df["PositionGrouped"] = df.loc[:, "Position"].transform(lambda x: posicionesGrupos[x])
+    df["PositionSinLado"] = df.loc[:, "Position"].transform(lambda x: posicionesSinLado[x])
     df["PositionLongName"] = df.loc[:, "Position"].transform(lambda x: dicPos[x])
     return df
 
-def read_csv(nombre_archivo: str, symbols_columns: dict, columnas_drop: list, change_units: dict):
+def read_csv(nombre_archivo: str,  columnas_drop: list, change_units: dict):
     dataframe = pd.read_csv(nombre_archivo)
-    dataframe = __deleteSymbols(dataframe, symbols_columns, columnas_drop)
+    dataframe = __deleteSymbols(dataframe,  columnas_drop)
     dataframe = __change_UNITS(dataframe, change_units)
     dataframe= __posiciones(dataframe)
     dataframe = dataframe.set_index("Name")
+    dataframe =to_numeric(dataframe)
     return dataframe
 
 
@@ -117,7 +166,6 @@ if __name__ == "__main__":
     nombre_archivo="../data/interin/dataFIFA.csv"
     file_config = open('../config/config.yaml', encoding='utf8')
     config =  load_config.config()
-    preprocess_dict = config["preprocessing"]["symbol_columns"]
     columnas_drop = config["preprocessing"]["columns_drop"]
     change_units = config["preprocessing"]["unidades_conversion"]
 
@@ -126,7 +174,7 @@ if __name__ == "__main__":
     logger = logging.getLogger('preprocessing')
 
 
-    df = read_csv(nombre_archivo, preprocess_dict, columnas_drop, change_units)
+    df = read_csv(nombre_archivo, columnas_drop, change_units)
     df.to_csv("../data/preprocesed/dataFIFA.csv")
     logger.info('preprecesamiento de dataframe {}'.format(nombre_archivo))
 
