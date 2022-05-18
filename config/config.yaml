@@ -80,7 +80,7 @@ entrenamiento:
   optimizar: False
   feature_clasificacion: "Position"  # variable que se quiere predecir con el modelo de clasificacion
 
-  feature_regresion: "Value"  #variable que se quiere predecir con el modelo de regresion
+  feature_regresion: "Wage"  #variable que se quiere predecir con el modelo de regresion
 
   train_test_split: 0.7
   search: "grid"  #tipo de busqueda si se hace optmizacion, grid o random
@@ -170,9 +170,9 @@ entrenamiento:
       k_neighbors:
           metric: "minkowski"
       random_forest:
-        n_estimators: 1
-        max_depth: 20
-        min_samples_split: 10
+        n_estimators: 50
+        max_depth: 15
+        min_samples_split: 2
 
       gradient_boosting:
         learning_rate: 0.1 #default 0.1

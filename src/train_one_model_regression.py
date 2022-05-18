@@ -17,9 +17,10 @@ if __name__ == '__main__':
     df = pd.read_csv("../data/preprocesed/dataFIFA.csv",index_col=0)
     nombre_modelo="SVR"
     feature =config["entrenamiento"]["feature_regresion"]
-    df=df.loc[df[feature] > 0]
-    #df=df.loc[(df.Wage>=15000)]
-    print(len(df.loc[df.libre==0]),len(df.loc[df.Wage==0]),len(df.loc[df.Value==0]))
+
+    df=df.loc[(df[feature] >1000) & (df[feature]<=5000)]
+    print(len(df), len(df.loc[df.Wage == 0]), len(df.loc[df.Value == 0]))
+
 
     columnas = obtener_variables_predictoras.obtenerVariablesPredictoras("todas")
 

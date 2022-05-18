@@ -31,9 +31,11 @@ Regresión.
 * Value. Se consigue un SMAPE de 0.23 usando SVR con kernel rbf y haciendo una transformacion logaritmica sobre la variable (pero las metricas siempre calculadas sobre la variable
 original, en caso de transformar se hace la transformacion inversa antes de calcular las metricas). Utilizando algoritmos lineales se consigue un SMAPE de 0.29.
 * Wage. Usando todos los datos se consiguen malos resultados, los mejores usando SVR con kernel rbf y haciendo la tranformación de antes, se consigue un SMAPE de 0.45.
-Sin embargo, si se divide el dataset por sueldos se pueden mejorar significativamente los resultados. 
+Eliminando los 4873 que tienen salario exacto de 1000 (en estos casos quizás no tiene mucha relación con las características) el SMAPE mejora y pasa a ser 0.39.
+* Si se divide el dataset por sueldos se pueden mejorar significativamente los resultados. 
 Por ejemplo, cogiendo los jugadores con sueldos superiores o iguales a 25000 euros (1619 jugadores) se consigue un SMAPE de 0.28, con jugadores de entre 5000 y 25000 (5506 jugadores )se consigue un SMAPE de 0.30 y
-con jugadores de sueldos inferiores o iguales a 5000 euros   (11889 jugadores)el SMAPE es de 0.36. Esto sin embargo no se podrá aplicar en la práctica porque puedes no saber en qué rango de sueldo está el jugador, habría que 
+con jugadores de sueldos inferiores o iguales a 5000 euros   (11889 jugadores)el SMAPE es de 0.36. Para estos últimos si además se eliminan los jugadores con salario de 1000 euros, quedando 6787, el SMAPE pasa a ser 0.25, y se puede conseguir incluso con un modelo lineal como lasso.
+* Esto sin embargo no se podrá aplicar en la práctica porque puedes no saber en qué rango de sueldo está el jugador, habría que 
 encontrar una variable que lo indique y ya se podría incluir en el modelo.
 
 Se utiliza el dataset completo expceto los jugadores que tienen la variable a predecir igual a 0 (Value o Wage).
