@@ -28,7 +28,8 @@ Los modelos  se encapsulan en un objeto definodo en <b>functions/machine_learnin
 (Todas las métricas sobre validation test usando train_test_split de 0.7)
 
 Regresión. 
-* Value. Se consigue un SMAPE de 0.23 usando SVR con kernel rbf y haciendo una transformacion logaritmica sobre la variable (pero las metricas siempre calculadas sobre la variable
+* Value. Se consigue un SMAPE de 0.23 usando gradient boosting, y también se consiguen resultados muy similares con random forest y  SVR con kernel rbf. 
+En todos los casos haciendo una transformacion logaritmica sobre la variable (pero las metricas siempre calculadas sobre la variable
 original, en caso de transformar se hace la transformacion inversa antes de calcular las metricas). Utilizando algoritmos lineales se consigue un SMAPE de 0.29.
 * Wage. Usando todos los datos se consiguen malos resultados, los mejores usando SVR con kernel rbf y haciendo la tranformación de antes, se consigue un SMAPE de 0.45.
 Eliminando los 4873 que tienen salario exacto de 1000 (en estos casos quizás no tiene mucha relación con las características) el SMAPE mejora y pasa a ser 0.39.
@@ -45,7 +46,7 @@ incluyendo los jugadores sin equipo empeora el modelo, y no se consigue mejorar 
 
 Clasificación.
 * Clasificación por grupos. Agrupando las posiciones en Delantero,Medio, Defensa y Portero se consiguen buenas métricas con muchos modelos.
-La mejor es con random forest, con Accuracy de 0.86.
-* Si utilizamos las 27 posiciones originales del FIFA, incluyendo solo las características de juego para predecir la accuracy es de 0.51 (usando también random forest), pero si incluimos el pie bueno asciende a 0.57.
+La mejor es SVC con kernel rbf, con Accuracy de 0.87.
+* Si utilizamos las 27 posiciones originales del FIFA, incluyendo solo las características de juego para predecir la accuracy es de 0.51 (usando también random forest), pero si incluimos el pie bueno asciende a 0.62 usando SVC con kernel linear.
 Esto pasa porque muchos fallos en este modelo suceden entre la misma posición pero en el lado derecho, centro o izquierdo que se predicen casi siempre como centro.
-* Si utilizamos las posiciones originales pero eliminando derecha e izquierda y asignando la posición central (16 clases) se consigue una accuracy ed 0.71 (también con random forest).
+* Si utilizamos las posiciones originales pero eliminando derecha e izquierda y asignando la posición central (16 clases) se consigue una accuracy ed 0.75 (también con SVC pero con kernel linear).

@@ -1,3 +1,6 @@
+import os.path
+import sys
+
 import pandas as pd
 from config import load_config
 from functions import obtener_variables_predictoras, entrenamiento
@@ -8,20 +11,24 @@ import pickle
 import warnings
 warnings.filterwarnings('ignore')
 logging.config.fileConfig('../logs/logging.conf')
-logger = logging.getLogger('training')
+
 
 
 
 if __name__ == '__main__':
+    logger = logging.getLogger('training')
     config = load_config.config()
+    nombre_dir_modelos = config["nombre_dir_modelos_pruebas"]
+
     df = pd.read_csv("../data/preprocesed/dataFIFA.csv",index_col=0)
 
     features_tipo = {
         #"Wage": machine_learning.Regresor,
-        "Value": machine_learning.Regresor,
-        "PositionGrouped": machine_learning.Clasificador
+        #"Value": machine_learning.Regresor,
+        "PositionGrouped": machine_learning.Clasificador,
+        "PositionSinLado": machine_learning.Clasificador,
+        "Position": machine_learning.Clasificador
     }
-
 
 
     #entrenamiento para cada variable de las 3 con todos sus modelos (clasificacin o regresion)
@@ -49,6 +56,8 @@ if __name__ == '__main__':
                     # si es de regression eliminamos los jugadores con valor de ese feature=0 porque esto no depende de
                     # las caracteristicas.  Ocurre para los jugadores que no tienen equipo
                     df=df.loc[df[feature]>0]
+                    if feature=="Wage":
+                        df=df.loc[df.Wage!=1000]
 
                 modelo_encapsulado,X_train, X_test, y_train, y_test = entrenamiento.ejecutarModelo(
                         nombre_modelo, feature, tipo_modelo, df,
@@ -59,8 +68,9 @@ if __name__ == '__main__':
                 logger.info("Prediccion para {} con modelo {} con {}: {} ".format(feature, nombre_modelo,
                                                                                   info_variables, modelo_encapsulado.metrics()))
                 #guardamos el modelo
-
-                with open("../assets/pruebasModelos/" +feature+"_"+ nombre_modelo, 'wb') as handle:
+                if not os.path.isdir(nombre_dir_modelos):
+                    os.makedirs(nombre_dir_modelos)
+                with open(nombre_dir_modelos +feature+"_"+ nombre_modelo, 'wb') as handle:
                     pickle.dump(modelo_encapsulado, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

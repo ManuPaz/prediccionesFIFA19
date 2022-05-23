@@ -25,10 +25,12 @@ if __name__ == "__main__":
     df = df.loc[(df.Wage > 0) & (df.Value > 0)]
     config = load_config.config()
     todos_los_modelos = config["forecasting"]["todos_los_modelos"]
+
+
     if todos_los_modelos:
-        dir = "../assets/pruebasModelos/"
+        dir =  config["nombre_dir_modelos"]
     else:
-        dir = "../assets/modelosFinales/"
+        dir = config["nombre_dir_mejores_modelos"]
 
     nombres_files = os.listdir(dir)
 

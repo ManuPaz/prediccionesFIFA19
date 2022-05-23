@@ -8,14 +8,15 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.decomposition import PCA
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, make_scorer, mean_squared_error, \
     mean_absolute_percentage_error, confusion_matrix
-from sklearn.svm import LinearSVC,LinearSVR,SVR
-from sklearn.linear_model import RidgeCV, LassoCV, LinearRegression, ElasticNet,LogisticRegression
+from sklearn.svm import LinearSVC,LinearSVR,SVR,SVC
+from sklearn.linear_model import RidgeCV, LassoCV, LinearRegression, ElasticNetCV,LogisticRegression
 from functions import machine_learninge_utils
 import numpy as np
 from utils import funcionesMatematicas
 from config import load_config
 import logging.config
 from sklearn import preprocessing
+from sklearn.pipeline import Pipeline
 config = load_config.config()
 
 logging.config.fileConfig('../logs/logging.conf')
@@ -26,12 +27,12 @@ scorer = make_scorer(f1_score, average="macro")
 modelosClasificacion = {"decision_tree": DecisionTreeClassifier, "random_forest": RandomForestClassifier,
                         "gradient_boosting": GradientBoostingClassifier, "ada_boosting": AdaBoostClassifier,
                         "linear_SVC": LinearSVC, "logistic": LogisticRegression,
-                        "k_neighbors": KNeighborsClassifier,
+                        "k_neighbors": KNeighborsClassifier,"SVC":SVC,
                         "lda": LinearDiscriminantAnalysis}
 modelosRegresion = {"ridge": RidgeCV, "lasso": LassoCV, "linear": LinearRegression,
                     "k_neighbors": KNeighborsRegressor,"random_forest":RandomForestRegressor,
                     "gradient_boosting": GradientBoostingRegressor,"linear_SVR":LinearSVR,
-                    "logistic":LogisticRegression, "elastic_net":ElasticNet,"SVR":SVR}
+                    "logistic":LogisticRegression, "elastic_net":ElasticNetCV,"SVR":SVR}
 
 
 class HyperParameterTuning():
@@ -134,27 +135,10 @@ class HyperParameterTuning():
         return self.__y_pred
 
     @property
-    def standar_scaler_X(self):
-        """
-
-        :return: preprocessing.StandarScaler si se normaliza la X
-        """
-        return self.__standar_scaler_X
-
-    @property
-    def dimension_reducer(self):
-        """
-
-        :return: pca  si se reduce la dimension de la X
-        """
-        return self.__dimension_reducer
-
-
-    @property
     def normalize_X(self):
         """
 
-        :return: si se normaliza el dataframe o no
+        :return: si se normaliza la X o no
         """
         return self.__normalize_X
 
@@ -162,9 +146,25 @@ class HyperParameterTuning():
     def dimension_reduction(self):
         """
 
-        :return: preprocessing.StandarScaler si se normaliza la X
+        :return: si se reduce las dimensiones o no
         """
         return self.__dimension_reduction
+
+
+    @property
+    def pipeline(self):
+        """
+
+        :return: pipeline para transformar la X
+        """
+        return self.__pipeline
+    @property
+    def usar_transform_pipeline(self):
+        """
+
+        :return: si se usa alguna transformacion o no
+        """
+        return self.__usar_transform_pipeline
 
     @property
     def jugadores_train(self):
@@ -208,11 +208,24 @@ class HyperParameterTuning():
         self.__tipo_busqueda = config["entrenamiento"]["search"]
         self.__normalize_X = config["entrenamiento"]["normalize_X"]
         self.__dimension_reduction=config["entrenamiento"]["reducir_dimensionalidad"]
-
+        self.__usar_transform_pipeline=False
+        arrayPipeline=[]
         if self.__normalize_X:
-            self.__standar_scaler_X=preprocessing.StandardScaler()
+            self.__usar_transform_pipeline = True
+            if config["entrenamiento"]["scale_X"]:
+                arrayPipeline.append(("scaler",preprocessing.MinMaxScaler()))
+
+
+            else:
+                arrayPipeline.append(("scaler", preprocessing.StandardScaler()))
+
         if self.__dimension_reduction:
-            self.__dimension_reducer  = PCA(n_components=6)
+            self.__usar_transform_pipeline = True
+            arrayPipeline.append(("pca", PCA(n_components=6)))
+
+        if self.__usar_transform_pipeline:
+            self.__pipeline = Pipeline(arrayPipeline)
+
 
 
 
@@ -222,8 +235,13 @@ class HyperParameterTuning():
             for param in config["entrenamiento"][tipo]["param_tunning"][name]:
                 l = config["entrenamiento"][tipo]["param_tunning"][name][param]
                 if len(l) == 3:
-                    values = np.arange(l[0], l[1], l[2])
+                    try:
+                        values =np.arange(l[0], l[1], l[2]).tolist()
+                    except Exception as e:
+                        values=l
+
                 else:
+
                     values = l
                 self.__param_grid[param] = values
 
@@ -231,6 +249,10 @@ class HyperParameterTuning():
             for param in config["entrenamiento"][tipo]["params"][name]:
                 l = config["entrenamiento"][tipo]["params"][name][param]
                 self.__params[param] = l
+                if l == "None":
+                    self.__params[param]=None
+
+
 
 
 
@@ -250,16 +272,13 @@ class HyperParameterTuning():
         :return: las predicciones realizadas
         """
         if X_test is not None:
-            self.__X_test = X_test
+            self.__X_test = X_test.copy()
+            if self.__usar_transform_pipeline:
+                self.__X_test = self.__pipeline.transform(self.__X_test)
 
-            if self.normalize_X:
-                self.__X_test=self.standar_scaler_X.transform(self.__X_test)
-
-            if self.__dimension_reduction:
-                self.__X_test = self.__dimension_reducer.fit_transform(self.__X_test)
 
         if y_test is not None:
-            self.__y_test = y_test
+            self.__y_test = y_test.copy()
         self.__y_pred = self.__modelo.predict(self.__X_test)
 
 
@@ -268,7 +287,7 @@ class HyperParameterTuning():
     def __fit_predict(self):
         # si hay parametros para optimizar y se quiere optimizar se opmitizan con random search p con grid search
         if self.__optimizar and len(self.__param_grid.keys()) > 0:
-            parametros = machine_learninge_utils.parameter_search(self.__modelo(), self.__param_grid, self.__X_train, self.__y_train,
+            parametros = machine_learninge_utils.parameter_search(self, self.__param_grid, self.__X_train, self.__y_train,
                                                                   cv=self.__cv, n_iter=self.__n_iter,
                                                                   tipo=self.__tipo_busqueda, scorer=self.__scorer)
             self.__params.update(parametros)
@@ -294,21 +313,17 @@ class HyperParameterTuning():
         """
 
         self.__variables=X_train.columns
-        self.__X_train=X_train
-        self.__X_test = X_test
-        self.__y_train= y_train
-        self.__y_test = y_test
+        self.__X_train=X_train.copy()
+        self.__X_test = X_test.copy()
+        self.__y_train= y_train.copy()
+        self.__y_test = y_test.copy()
 
         #guardamos los nombres de los jugadores del train set
         self.__jugadores_train= self.__X_train.index
 
-        if self.normalize_X:
-            self.__X_train = self.standar_scaler_X.fit_transform(self.__X_train)
-            self.__X_test = self.standar_scaler_X.transform(self.X_test)
-        if self.__dimension_reduction:
-            self.__X_train = self.__dimension_reducer.fit_transform(self.__X_train)
-            self.__X_test = self.__dimension_reducer.transform(self.__X_test)
-            print(np.cumsum(self.__dimension_reducer.explained_variance_ratio_))
+        if self.__usar_transform_pipeline:
+            self.__X_train = self.__pipeline.fit_transform(self.__X_train)
+            self.__X_test = self.__pipeline.transform(self.X_test)
         self.__fit_predict()
 
 
@@ -332,7 +347,7 @@ class Clasificador(HyperParameterTuning):
         super().__init__(name,feature,"classification")
         self.modelo = modelosClasificacion[name]
         self.__compute_metrics = config["entrenamiento"]["classification"]["multi_class_score"]
-        self.scorer = make_scorer(f1_score, average=self.__compute_metrics,greater_is_better=True)
+        self.scorer = make_scorer(accuracy_score,greater_is_better=True)
 
 
     def predict_probabilities(self,  X_test):
@@ -342,10 +357,9 @@ class Clasificador(HyperParameterTuning):
         :return: propbabilidades de cada clase para cada prediccion
         """
         self.X_test=X_test
-        if self.normalize_X:
-            self.X_test = self.standar_scaler_X.transform(self.X_test)
-        if self.dimension_reduction:
-            self.X_test = self.dimension_reducer.transform(self.X_test)
+        if self.usar_transform_pipeline:
+            self.X_test = self.pipeline.transform(self.X_test)
+
 
 
         y_proba = self.modelo.predict_proba(self.X_test)
@@ -372,22 +386,8 @@ class Regresor(HyperParameterTuning):
 
         :return: si se transforma la y con una funcion o no (logaritmica por ejemplo)
         """
-        return self.__transform
+        return self.__function_transform
 
-    @property
-    def function_transformer(self):
-        """
-
-        :return: preprocessing.FunctionTransformed si function_transform=True
-        """
-        return self.__function_transformer
-    @property
-    def standar_scaler_y(self):
-        """
-
-        :rtype: devuelve el standar scaler si se normaliza la y
-        """
-        return self.__standar_scaler_y
     @property
     def normalize_y(self):
         """
@@ -395,6 +395,15 @@ class Regresor(HyperParameterTuning):
         :return: si se normaliza la y o no
         """
         return self.__normalize_y
+    @property
+    def pipeline_y(self):
+        """
+
+        :return: pipeline to transform y
+        """
+        return self.__pipeline_y
+
+
 
     def __init__(self, name, feature):
         """
@@ -404,46 +413,55 @@ class Regresor(HyperParameterTuning):
         """
         super().__init__(name,feature,"regression")
         self.modelo = modelosRegresion[name]
-        self.scorer =make_scorer(mean_squared_error, greater_is_better=False)
+
         self.__normalize_y = config["entrenamiento"]["regression"]["normalize_y"]
         self.__function_transform = config["entrenamiento"]["regression"]["transformacion_logaritmica"]
+
+        if self.__function_transform:
+            self.scorer = make_scorer(machine_learninge_utils.SMAPE, greater_is_better=False,transformation=self)
+        else:
+            self.scorer = make_scorer(machine_learninge_utils.SMAPE, greater_is_better=False)
+
+        self.__usar_pipeline_y=False
+        arrayPipeline=[]
         if self.__normalize_y:
-            self.__standar_scaler_y = preprocessing.StandardScaler()
+            self.__usar_pipeline_y=True
+            arrayPipeline.append(("scaler",preprocessing.StandardScaler()))
         if self.__function_transform :
-            self.__function_transformer = preprocessing.FunctionTransformer(func=funcionesMatematicas.log_1,inverse_func=funcionesMatematicas.exp_1)
+            self.__usar_pipeline_y = True
+            arrayPipeline.append(("log",preprocessing.FunctionTransformer \
+                (func=funcionesMatematicas.log_1,inverse_func=funcionesMatematicas.exp_1)))
 
-
+        if self.__usar_pipeline_y:
+            self.__pipeline_y=Pipeline(arrayPipeline)
     def fit_predict(self, X_train, y_train, X_test, y_test):
         """
         Extiende la clase del padre añadiendo las transformaciones numericas sobre la y si son necesarias
         :param X_train: pandas dataframe
-        :param y_train:  pandas dataframe / pandas series
+        :param y_train:   pandas series
         :param X_test: pandas dataframe
-        :param y_test: pandas dataframe / pandas series
+        :param y_test:  pandas series
         """
-        # se aplican transformaciones numericas sobre la y, que en clasificacion no hay
-        #lo normal es que se aplique una transformacion sobre la y o se normalice,pero si se aplican las dos
-        #primero se aplica la transformacion y luego se normaliza
-        y_train = y_train.to_numpy().reshape(-1,1 )
-        if self.__function_transform:
-            y_train=self.__function_transformer.fit_transform(y_train)
-        if self.__normalize_y:
-            y_train = self.__standar_scaler_y.fit_transform(y_train)
+
+        y_train=y_train.to_numpy().reshape(-1,1)
+
+        if self.__usar_pipeline_y:
+            y_train = self.__pipeline_y.fit_transform(y_train)
+
 
         # genera self.y_pred
         super().fit_predict( X_train, y_train, X_test, y_test)
 
         #recuperamos las predicciones originales para comparar con y_test
-        self.y_pred = self.y_pred.reshape(-1,1)
-        if self.__normalize_y:
-            self.y_pred = self.__standar_scaler_y.inverse_transform(self.y_pred)
-        if self.__function_transform:
-            self.y_pred = self.__function_transformer.inverse_transform(self.y_pred)
+        if self.__usar_pipeline_y:
+            self.y_pred = self.__pipeline_y.inverse_transform(self.y_pred.reshape(-1,1))
+
 
     def metrics(self):
+
         mse = mean_squared_error(self.y_test, self.y_pred)
         mape = mean_absolute_percentage_error(self.y_test, self.y_pred)
-        smape= machine_learninge_utils.SMAPE(self.y_test, self.y_pred.reshape(-1))
+        smape= machine_learninge_utils.SMAPE(self.y_test, self.y_pred)
         return {"mse": mse, "mape": mape, "smape": smape}
 
     def predict(self,X_test=None,y_test=None):
@@ -458,10 +476,8 @@ class Regresor(HyperParameterTuning):
         super().predict(X_test,y_test)
 
         # recuperamos las predicciones originales para comparar con y_test
-        if self.__normalize_y:
-            self.y_pred = self.standar_scaler_y.inverse_transform(self.y_pred.reshape(-1, 1))
-        if self.__function_transform:
-            self.y_pred = self.__function_transformer.inverse_transform(self.y_pred.reshape(-1, 1))
+        if self.__usar_pipeline_y:
+            self.y_pred = self.__pipeline_y.inverse_transform(self.y_pred.reshape(-1,1))
 
 
         return self.y_pred
