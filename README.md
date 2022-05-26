@@ -20,6 +20,8 @@ se muestran las predicciones ( con el mejor modelo o todos) y el valor real.
 Se guardan en formato json y se indican los parametros no por defecto que se utilizaron.
 En el directorio de plots se guardan los plots con las predicciones vs datos reales sobre el total de los datos y solo sobre los datos de validación para cada modelo.
 En los modelos de regresión se usan gráficos de dispersión y en los de clasificación gráficos de densidad.
+En los modelos de dispersión se muestran los gráficos con todos los datos y los gráficos eliminando los valores más altos para ver los datos más concetrados en una mejor escala.
+En los gráficos de clasificación hay gráficos con texto (con el número de muestras para cada bin) y sin texto.
 * **assets** En el directorio <b>mejoresModelos</b> se guerda el objeto con el modelo seleccionado para cada variable.
 
 Todos los parámetros se configuran en <b>config.yaml</b>, los de entrenamiento y otros (hiperparámetros, hacer optimización de hiperparámetros en el entrenamiento o no,
