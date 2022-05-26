@@ -76,6 +76,8 @@ nombre_dir_mejores_modelos: "../assets/mejoresModelos/"
 nombre_dir_modelos_pruebas: "../assets/pruebasModelos/"
 nombre_dir_reportes_cv: "../reports/resultados_entrenamiento_cv/"
 nombre_dir_reportes_finales: "../reports/resultados_finales/"
+nombre_dir_reportes_plots_all: "../reports/plots/all/"
+nombre_dir_reportes_plots_test: "../reports/plots/test/"
 entrenamiento:
 
   reportar_entrenamiento: True #para guardar o no el reporte del entrenamiento
@@ -95,7 +97,7 @@ entrenamiento:
   reducir_dimensionalidad: False #usar pca para reducir la dimensionalidad
 
   feature_clasificacion: "Position"  # variable que se quiere predecir con el modelo de clasificacion
-  feature_regresion: "Wage"  #variable que se quiere predecir con el modelo de regresion
+  feature_regresion: "Value"  #variable que se quiere predecir con el modelo de regresion
 
   features_regresion: ["Value", "Wage"]
   features_clasificacion: ["Position","PositionGrouped","PositionSinLado"]
@@ -189,9 +191,9 @@ entrenamiento:
     modelos: [ "k_neighbors"] #modelos a probar en train_all
 
     todos: [ "ridge", "lasso", "linear",
-               "k_neighbors", "random_forest",
-               "gradient_boosting","linear_SVR",
-          "logistic","elastic_net","SVR"] #todos los modelos considerados
+              "k_neighbors", "random_forest",
+              "gradient_boosting","linear_SVR",
+              "elastic_net","SVR"] #todos los modelos considerados
 
   #configuracion para la optimizacion de parametros
     param_tunning: #parametros a optimizar

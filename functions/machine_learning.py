@@ -459,10 +459,10 @@ class Regresor(HyperParameterTuning):
 
     def metrics(self):
 
-        mse = mean_squared_error(self.y_test, self.y_pred)
+
         mape = mean_absolute_percentage_error(self.y_test, self.y_pred)
         smape= machine_learninge_utils.SMAPE(self.y_test, self.y_pred)
-        return {"mse": mse, "mape": mape, "smape": smape}
+        return { "mape": mape, "smape": smape}
 
     def predict(self,X_test=None,y_test=None):
         """

@@ -16,6 +16,11 @@ se muestran las predicciones ( con el mejor modelo o todos) y el valor real.
 * **train_one_model_regression**. Para entrenar un solo modelo de regresión sobre una variable.
 * **train_one_model_clasificacion**. Para entrenar un solo modelo de clasificación sobre una variable.
 * **plots** Para visualizar los datos.
+* **reports** Se guardan en un directorio los resultados de cross validation para todos los modelos  y en otro los resultados con cada modelo con los parámetros seleccionados (todo esto para cada variable). 
+Se guardan en formato json y se indican los parametros no por defecto que se utilizaron.
+En el directorio de plots se guardan los plots con las predicciones vs datos reales sobre el total de los datos y solo sobre los datos de validación para cada modelo.
+En los modelos de regresión se usan gráficos de dispersión y en los de clasificación gráficos de densidad.
+* **assets** En el directorio <b>mejoresModelos</b> se guerda el objeto con el modelo seleccionado para cada variable.
 
 Todos los parámetros se configuran en <b>config.yaml</b>, los de entrenamiento y otros (hiperparámetros, hacer optimización de hiperparámetros en el entrenamiento o no,
 modelos a utilizar, variables a predecir etc).
