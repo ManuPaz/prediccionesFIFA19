@@ -26,9 +26,8 @@ if __name__ == "__main__":
     config = load_config.config()
     todos_los_modelos = config["forecasting"]["todos_los_modelos"]
 
-
     if todos_los_modelos:
-        dir =  config["nombre_dir_modelos"]
+        dir = config["nombre_dir_modelos"]
     else:
         dir = config["nombre_dir_mejores_modelos"]
 
@@ -62,20 +61,18 @@ if __name__ == "__main__":
                     with open(dir + nombre_file, "rb") as file:
                         modeloEncapsulado = pickle.load(file)
 
-
                         jugadores_train = modeloEncapsulado.jugadores_train
 
                         rows_x = rows.loc[:, modeloEncapsulado.variables]
                         rows_y = rows.loc[:, variable_a_predecir]
-                        #añadimos una columna para saber si el jugador estaba en train o test
-                        rows["test_or_train"] = rows.Name.transform(lambda x: "train" if x in jugadores_train else "test")
-
+                        # añadimos una columna para saber si el jugador estaba en train o test
+                        rows["test_or_train"] = rows.Name.transform(
+                            lambda x: "train" if x in jugadores_train else "test")
 
                         pred = modeloEncapsulado.predict(rows_x, rows_y)
                         rows[modeloEncapsulado.name] = pred
                         cols.append(modeloEncapsulado.name)
                         cols.append("test_or_train")
-
 
             print((rows.loc[:, cols]))
         else:

@@ -1,8 +1,10 @@
 import yaml
+
 file_config = open('../config/config.yaml')
 config = yaml.load(file_config, Loader=yaml.FullLoader)
 
-def obtenerVariablesPredictoras( feature: str):
+
+def obtenerVariablesPredictoras(feature: str):
     """
     Devuelve las variables predictoras para cada feature
     :param feature: variable de que se quieren obtener sus variables predictoras
