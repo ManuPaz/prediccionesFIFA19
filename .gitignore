@@ -51,6 +51,8 @@
 */logsForecasting.txt
 */modelosFinales/*
 */pruebasModelos/*
+#other
+poetry.lock
 # CMake
 cmake-build-*/
 
