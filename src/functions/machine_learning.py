@@ -15,7 +15,7 @@ from utils import load_config
 import logging.config
 from sklearn import preprocessing
 from sklearn.pipeline import Pipeline
-
+from typing import Callable
 config = load_config.config()
 
 logging.config.fileConfig('logs/logging.conf')
@@ -34,13 +34,14 @@ modelosRegresion = {"ridge": RidgeCV, "lasso": LassoCV, "linear": LinearRegressi
                     "logistic": LogisticRegression, "elastic_net": ElasticNetCV, "SVR": SVR}
 
 
-class HyperParameterTuning():
+class HyperParameterTuning:
 
     @property
     def name(self):
         """
 
         :return: nombre del modelo
+        :rtype: str
         """
         return self.__name
 
@@ -49,6 +50,7 @@ class HyperParameterTuning():
         """
 
         :return: variable que se quiere predecir
+        :rtype: str
         """
         return self.__feature
 
@@ -57,6 +59,7 @@ class HyperParameterTuning():
         """
 
         :return: modelo de sklearn
+
         """
         return self.__modelo
 
@@ -65,6 +68,7 @@ class HyperParameterTuning():
         """
 
         :return: espacio de parametros para optimizar
+        :rtype: dict
         """
         return self.__param_grid
 
@@ -73,6 +77,7 @@ class HyperParameterTuning():
         """
 
         :return: parametros del modelo
+        :rtype: dict
         """
         return self.__params
 
@@ -81,6 +86,7 @@ class HyperParameterTuning():
         """
 
         :return: si se quiere optimizar los parametros o no
+        :rtype: bool
         """
         return self.__optimizar
 
@@ -89,6 +95,7 @@ class HyperParameterTuning():
         """
 
         :return: grupos para el cross validation
+        :rtype: int
         """
         return self.__cv
 
@@ -97,6 +104,7 @@ class HyperParameterTuning():
         """
 
         :return: numero de iteraciones si se hace random search
+        :rtype: int
         """
         return self.__n_iter
 
@@ -105,6 +113,7 @@ class HyperParameterTuning():
         """
 
         :return: busqueda para la optimizacion de parametros: random o grid
+        :rtype: str
         """
         return self.__tipo_busqueda
 
@@ -113,6 +122,7 @@ class HyperParameterTuning():
         """
 
         :return: variables predictoras del modelo
+        :rtype: list
         """
         return self.__variables
 
@@ -120,7 +130,8 @@ class HyperParameterTuning():
     def scorer(self):
         """
 
-        :return: scorer para la metrica a optimizar en random search o grid search si se hacen: f1-score, accuracy, mse ..
+        :return: scorer para la metrica a optimizar en random search o grid search si se hacen: f1-score, accuracy, mse
+        :rtype: Callable
         """
         return self.__scorer
 
@@ -149,6 +160,7 @@ class HyperParameterTuning():
         """
 
         :return: si se normaliza la X o no
+        :rtype: bool
         """
         return self.__normalize_X
 
@@ -157,6 +169,7 @@ class HyperParameterTuning():
         """
 
         :return: si se reduce las dimensiones o no
+        :rtype: bool
         """
         return self.__dimension_reduction
 
@@ -165,6 +178,7 @@ class HyperParameterTuning():
         """
 
         :return: pipeline para transformar la X
+        :rtype: sklearn.pipeline.Pipeline
         """
         return self.__pipeline
 
@@ -173,6 +187,7 @@ class HyperParameterTuning():
         """
 
         :return: si se usa alguna transformacion o no
+        :rtype: bool
         """
         return self.__usar_transform_pipeline
 
@@ -198,14 +213,18 @@ class HyperParameterTuning():
 
     @scorer.setter
     def scorer(self, scorer):
+
         self.__scorer = scorer
 
     def __init__(self, name, feature, tipo):
         """
 
         :param tipo: regresor o clasificacion
+        :type tipo: str
         :param name: nombre del modelo. En funcion del nombre se coge el modelo de sklearn
+        :type name: str
         :param feature: variable a predecir
+        :type feature: str
         """
         self.__name = name
         self.__feature = feature
@@ -260,6 +279,14 @@ class HyperParameterTuning():
                 if l == "None":
                     self.__params[param] = None
 
+        #definicion de variables que se definen despues
+        self.__variables = []
+        self.__X_train = None
+        self.__X_test = None
+        self.__y_train = None
+        self.__y_test = None
+        self.__jugadores_train = []
+
     def __mensaje_log(self):
         log_text = "Entrenamiento de modelo {} para variable {}".format(self.name, self.feature)
         if len(self.params) > 0:
@@ -272,8 +299,11 @@ class HyperParameterTuning():
         """
         Si X_test o y_test son None se utilizan los que ya están guardados guardados en atributos
         :param X_test:
+        :type X_test: pd.DataFrame
         :param y_test:
+        :type y_test:  np.ndarray or pd.Series
         :return: las predicciones realizadas
+        :rtype: np.ndarray
         """
         if X_test is not None:
             self.__X_test = X_test.copy()
@@ -305,13 +335,20 @@ class HyperParameterTuning():
     def fit_predict(self, X_train, y_train, X_test, y_test):
         """
         Entrena el modelo haciendo optimizacion de parametros antes o no dependiendo de la configuracion
-        Predice para los datos de test.
+        predice para los datos de test.
         Hace las transformaciones sobre X que se determinen en la configuracion
-        Guarda X_train, X_test preprocesados y y_train e y_test
+        Guarda X_train, X_test preprocesados y y_train e y_test.
+
+
         :param X_train:
+        :type X_train: pd.DataFrame
         :param y_train:
+        :type y_train: np.ndarray or pd.Series
         :param X_test:
+        :type X_test: pd.DataFrame
         :param y_test:
+        :type y_test: np.ndarray or pd.Series
+
         """
 
         self.__variables = X_train.columns
@@ -336,6 +373,7 @@ class Clasificador(HyperParameterTuning):
         """
 
         :return: forma de computar las metricas para multiclase: macro, micro o average
+        :rtype: str
         """
         return self.__compute_metrics
 
@@ -349,11 +387,14 @@ class Clasificador(HyperParameterTuning):
         self.__compute_metrics = config["entrenamiento"]["classification"]["multi_class_score"]
         self.scorer = make_scorer(accuracy_score, greater_is_better=True)
 
-    def predict_probabilities(self, X_test):
+    def predict_probabilities(self, X_test:pd.DataFrame):
         """
         funcion que devuelve la probabilidade para cada clase en cada prediccion
         :param X_test:
-        :return: propbabilidades de cada clase para cada prediccion
+        :type X_test: pd.DataFrame
+        :return: probabilidades de cada clase para cada prediccion
+        :rtype: np.ndarray
+
         """
         self.X_test = X_test
         if self.usar_transform_pipeline:
@@ -371,6 +412,11 @@ class Clasificador(HyperParameterTuning):
         return {"precission": p, "recall": r, "f1_score": f1, "accuracy": ac}
 
     def confusion_matrix(self):
+        """
+
+        :return: matriz de confusion
+        :rtype: pd.DataFrame
+        """
         cm = confusion_matrix(self.y_test, self.y_pred, labels=self.modelo.classes_)
         cm = pd.DataFrame(cm, columns=self.modelo.classes_, index=self.modelo.classes_)
         return cm
@@ -405,8 +451,10 @@ class Regresor(HyperParameterTuning):
     def __init__(self, name, feature):
         """
 
-        :param name:
-        :param feature variable a predecir
+        :param name: nombre del modelo. Se usa para seleccionar el modelo de sklearn
+        :type name: str
+        :param feature: variable a predecir
+        :type feature: str
         """
         super().__init__(name, feature, "regression")
         self.modelo = modelosRegresion[name]
@@ -434,11 +482,16 @@ class Regresor(HyperParameterTuning):
 
     def fit_predict(self, X_train, y_train, X_test, y_test):
         """
-        Extiende la clase del padre añadiendo las transformaciones numericas sobre la y si son necesarias
-        :param X_train: pandas dataframe
-        :param y_train:   pandas series
-        :param X_test: pandas dataframe
-        :param y_test:  pandas series
+        Extiende la clase del padre añadiendo las transformaciones numericas sobre la y si son necesarias.
+
+        :param X_train:
+        :type X_train : pd.DataFrame
+        :param y_train:
+        :type y_train:  pd.Series
+        :param X_test:
+        :type X_test:  pd.DataFrame
+        :param y_test:
+        :type y_test: pd.Series
         """
 
         y_train = y_train.to_numpy().reshape(-1, 1)
@@ -463,9 +516,12 @@ class Regresor(HyperParameterTuning):
         """
         Extiende la clase del padre añadiendo las transformaciones inversas sobre las predicciones si son necesarias
 
-        :param X_test:
-        :param y_test:
-        :return:
+        :param X_test: Si no se usa se utiliza el X_test que esté guardado en el modelo
+        :type X_test:  pd.DataFrame
+        :param y_test: Si no se usa se utiliza el y_test que esté guardado en el modelo
+        :type y_test: np.ndarray or pd.Series
+        :return: serie de predicciones
+        :rtype: np.ndarray
         """
         # genera self.y_pred
         super().predict(X_test, y_test)

@@ -20,8 +20,8 @@ if __name__ == '__main__':
     df = pd.read_csv("data/preprocesed/dataFIFA.csv", index_col=0)
 
     features_tipo = {
-        #"Wage": machine_learning.Regresor,
-        #"Value": machine_learning.Regresor,
+        "Wage": machine_learning.Regresor,
+        "Value": machine_learning.Regresor,
         "PositionGrouped": machine_learning.Clasificador,
         "PositionSinLado": machine_learning.Clasificador,
         "Position": machine_learning.Clasificador

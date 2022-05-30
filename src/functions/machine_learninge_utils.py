@@ -3,31 +3,32 @@ from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 import numpy as np
 from functions import machine_learning
 from utils import report_model_results
-
+from typing import Callable
 
 
 
 def parameter_search(modelo_encapsulado, param_grid, X_train, y_train, scorer, n_iter=10, cv=10, tipo="random"):
     """
     Optmizacion de parametros
+
     :param modelo_encapsulado: objeto que encapsula modelo
-    :type: HyperParameterTuning
+    :type modelo_encapsulado: machine_learning.HyperParameterTuning
     :param param_grid: espacio de parametros
-    :type: dict
+    :type param_grid: dict
     :param X_train:
-    :type: pandas dataframe
+    :type X_train: pandas.DataFrame
     :param y_train:
-    :type: pandas dataframe o pandas series
+    :type y_train: pandas.DataFrame or pandas.Series
     :param scorer: scorer con la metrica que se quiere optimizar
-    :type: callable
+    :type scorer: Callable
     :param n_iter: número de iteraciones (necesario solo para random search)
-    :type: int
+    :type n_iter: int
     :param cv: número de grupos de cross validation
-    :type: int
+    :type cv: int
     :param tipo: random o grid
-    :type: str
+    :type tipo: str
     :return: parametros seleccionados
-    :type: dict
+    :rtype: dict
     """
     modelo = modelo_encapsulado.modelo()
     if tipo == "random":
@@ -64,13 +65,15 @@ def smape(real, fitted, transformation=None):
     """
 
     :param real: valores reales de y
-    :type: pandas series o numpy array
+    :type real: pandas.Series or numpy.ndarray
     :param fitted: predicciondes de y
-    :type: pandas series o numpy array
+    :type fitted: pandas.Series or numpy.ndarray
     :param transformation: para cuando se llame a este  metodo con el make_scorer en el random search
         si random_search trabaja con datos transformados  aqui se hace la inversa para usar la metrica sobre los originales
         vale para cualquier otro caso en que no se quieran mandar los datos ya transformados a los originales
-    :return:
+    :type transformation: sklearn.pipeline.Pipeline
+    :return: smape
+    :rtype: float
     """
     if transformation is not None:
         real = transformation.pipeline_y.inverse_transform(real.reshape(-1, 1))

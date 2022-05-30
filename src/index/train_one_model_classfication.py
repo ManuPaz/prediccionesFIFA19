@@ -40,6 +40,7 @@ if __name__ == '__main__':
         print(metricas)
 
         modelo_encapsulado.predict(X_train, y_train)
+        probs=modelo_encapsulado.predict(X_test, y_test)
         metricas_train = modelo_encapsulado.metrics()
         print(metricas)
         resultado = {"params_no_default": modelo_encapsulado.params,

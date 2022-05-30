@@ -85,7 +85,7 @@ entrenamiento:
   plot: True #variable para hacer plots o no durante el entrenamiento
   random_seed: 10
   train_test_split: 0.7
-  optimizar: True
+  optimizar: False
 
   entrenamiento_multiple_random: False #si entrenar un modelo con parametros ya fijos
   #utilizando  multiples separaciones train-validation para ver la consitencia del modelo en las predicciones en validacion
@@ -111,7 +111,7 @@ entrenamiento:
   classification: #parametros exclusivos de clasificacion
     multi_class_score: "macro" #forma de computar las metricas con multi clase. Micro agrega todas las clases
                                 #y macro calcula clase a clase y hace la media
-    modelos : [ "linear_SVC"
+    modelos : [ "lda"
                 ] #modelos a utilizar en train_all para clasificacion
 
     todos: [ "random_forest",
