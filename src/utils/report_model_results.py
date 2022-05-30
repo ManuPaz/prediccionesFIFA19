@@ -1,8 +1,7 @@
 import os
-from config import load_config
-from functions import machine_learning
+from utils import load_config
 import json
-config=load_config.config()
+config= load_config.config()
 nombre_reportes=config["nombre_dir_reportes_cv"]
 nombre_reportes_finales=config["nombre_dir_reportes_finales"]
 for nombre in [nombre_reportes,nombre_reportes_finales]:

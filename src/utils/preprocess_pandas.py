@@ -1,39 +1,44 @@
-import numpy as np
-import pandas as pd
-from config import load_config
+
 import logging.config
-pd.options.mode.chained_assignment = None
+import logging.config
+import pandas as pd
+from utils import load_config
 from sklearn.preprocessing import OrdinalEncoder
+pd.options.mode.chained_assignment = None
+
 def calcularDinero(x):
-    if not type(x)==float:
-        if x[-1]=="K":
-            return 1000*float(x[:-1])
-        elif x[-1]=="M":
-            return 1000000*float(x[:-1])
+    if not type(x) == float:
+        if x[-1] == "K":
+            return 1000 * float(x[:-1])
+        elif x[-1] == "M":
+            return 1000000 * float(x[:-1])
         else:
             return float(x)
     else:
         return x
-def __deleteSymbols(df,columnsDrop: list):
+
+
+def __deleteSymbols(df, columnsDrop: list):
     df.columns = [c.replace(' ', '') for c in df.columns]
     for column in columnsDrop:
         df.drop(column, axis=1, inplace=True)
 
-    for clave in ["Wage","Value","ReleaseClause"]:
-
-            df[clave] = df[clave].str.replace("€","")
-            df[clave] = df[clave].map(lambda x:calcularDinero(x))
+    for clave in ["Wage", "Value", "ReleaseClause"]:
+        df[clave] = df[clave].str.replace("€", "")
+        df[clave] = df[clave].map(lambda x: calcularDinero(x))
 
     return df
+
 
 def to_numeric(df):
-    df["PreferredFoot"]=df["PreferredFoot"].transform(lambda x: 1 if x=="Right" else 0).astype(float)
+    df["PreferredFoot"] = df["PreferredFoot"].transform(lambda x: 1 if x == "Right" else 0).astype(float)
     ord_enc = OrdinalEncoder()
-    df["BodyType"]=ord_enc.fit_transform(df[["BodyType"]])
-    df["libre"]=df["Club"].transform(lambda x: 1 if  not pd.isnull(x)   else 0)
+    df["BodyType"] = ord_enc.fit_transform(df[["BodyType"]])
+    df["libre"] = df["Club"].transform(lambda x: 1 if not pd.isnull(x) else 0)
     return df
-def __change_UNITS(df, change_units: dict):
 
+
+def __change_units(df, change_units: dict):
     for columna, unidades in change_units.items():
         df[columna] = df[columna].astype(str)
         if "separador" in unidades.keys():
@@ -48,7 +53,6 @@ def __change_UNITS(df, change_units: dict):
             valor = float(unidades["factor_conv"])
             df[columna] = df[columna].map(lambda x: round(float(x.replace(unidad, "")) * valor, 2))
     return df
-
 
 
 def __posiciones(df):
@@ -81,7 +85,7 @@ def __posiciones(df):
     dicPos["LS"] = "Delantero  Izquierdo "
     dicPos["RS"] = "Delantero derecho"
     dicPos["RB"] = "Lateral derecho"
-    dicPos
+
     posicionesGrupos = {}
     posicionesGrupos["GK"] = "P"
     posicionesGrupos["EB"] = "D"
@@ -151,30 +155,28 @@ def __posiciones(df):
     df["PositionLongName"] = df.loc[:, "Position"].transform(lambda x: dicPos[x])
     return df
 
-def read_csv(nombre_archivo: str,  columnas_drop: list, change_units: dict):
+
+def read_csv(nombre_archivo: str, columnas_drop: list, change_units: dict):
     dataframe = pd.read_csv(nombre_archivo)
-    dataframe = __deleteSymbols(dataframe,  columnas_drop)
-    dataframe = __change_UNITS(dataframe, change_units)
-    dataframe= __posiciones(dataframe)
+    dataframe = __deleteSymbols(dataframe, columnas_drop)
+    dataframe = __change_units(dataframe, change_units)
+    dataframe = __posiciones(dataframe)
     dataframe = dataframe.set_index("Name")
-    dataframe =to_numeric(dataframe)
+    dataframe = to_numeric(dataframe)
     return dataframe
 
 
 if __name__ == "__main__":
-
-    nombre_archivo="../data/interin/dataFIFA.csv"
-    file_config = open('../config/config.yaml', encoding='utf8')
-    config =  load_config.config()
+    nombre_archivo = "../data/interin/dataFIFA.csv"
+    file_config = open('../../config/config.yaml', encoding='utf8')
+    config = load_config.config()
     columnas_drop = config["preprocessing"]["columns_drop"]
     change_units = config["preprocessing"]["unidades_conversion"]
 
-    logging.config.fileConfig('../logs/logging.conf')
+    logging.config.fileConfig('../../logs/logging.conf')
     # create logger
     logger = logging.getLogger('preprocessing')
-
 
     df = read_csv(nombre_archivo, columnas_drop, change_units)
     df.to_csv("../data/preprocesed/dataFIFA.csv")
     logger.info('preprecesamiento de dataframe {}'.format(nombre_archivo))
-

@@ -1,27 +1,27 @@
 import os
+os.chdir("../../")
 import pickle
 import logging.config
 import pandas as pd
 import re
 import warnings
-import numpy as np
 
 pd.set_option('display.float_format', lambda x: '%.5f' % x)
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 warnings.filterwarnings('ignore')
-from config import load_config
+from utils import load_config
 
 pd.set_option('display.max_rows', 1000)
 # el usuario introduce parte de un nombre jugador o equipo y una variable y se muestran las predicciones y el valor real para diferentes modelos (todos o solo el mejor modelo) para los jugadores seleccionados
 
 if __name__ == "__main__":
-    logging.config.fileConfig('../logs/logging.conf')
+    logging.config.fileConfig('logs/logging.conf')
     # create logger
     logger = logging.getLogger('forecasting')
 
-    df = pd.read_csv("../data/preprocesed/dataFIFA.csv")
+    df = pd.read_csv("data/preprocesed/dataFIFA.csv")
     df = df.loc[(df.Wage > 0) & (df.Value > 0)]
     config = load_config.config()
     todos_los_modelos = config["forecasting"]["todos_los_modelos"]
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     dicEntradas = {1: "Wage", 2: "Value", 3: "PositionGrouped", 4: "Position", 5: "PositionSinLado"}
     cambiarJugadores = True
 
-    while (1):
+    while True:
         if cambiarJugadores:
             nombre_jugador = input("Nombre del jugador o equipo:\n")
             rows = df.loc[(df.Name.str.contains(nombre_jugador, regex=True, na=True, flags=re.IGNORECASE)) \

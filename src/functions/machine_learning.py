@@ -4,23 +4,21 @@ from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, Ran
     RandomForestRegressor, GradientBoostingRegressor
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
-from sklearn.linear_model import LogisticRegression
 from sklearn.decomposition import PCA
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, make_scorer, mean_squared_error, \
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, make_scorer, \
     mean_absolute_percentage_error, confusion_matrix
 from sklearn.svm import LinearSVC, LinearSVR, SVR, SVC
 from sklearn.linear_model import RidgeCV, LassoCV, LinearRegression, ElasticNetCV, LogisticRegression
 from functions import machine_learninge_utils
 import numpy as np
-from utils import funcionesMatematicas
-from config import load_config
+from utils import load_config
 import logging.config
 from sklearn import preprocessing
 from sklearn.pipeline import Pipeline
 
 config = load_config.config()
 
-logging.config.fileConfig('../logs/logging.conf')
+logging.config.fileConfig('logs/logging.conf')
 logger = logging.getLogger('training')
 
 scorer = make_scorer(f1_score, average="macro")
@@ -227,8 +225,6 @@ class HyperParameterTuning():
             self.__usar_transform_pipeline = True
             if config["entrenamiento"]["scale_X"]:
                 arrayPipeline.append(("scaler", preprocessing.MinMaxScaler()))
-
-
             else:
                 arrayPipeline.append(("scaler", preprocessing.StandardScaler()))
 
@@ -246,8 +242,11 @@ class HyperParameterTuning():
                 if len(l) == 3:
                     try:
                         values = np.arange(l[0], l[1], l[2]).tolist()
-                    except Exception as e:
+                    except TypeError:
                         values = l
+                    except Exception:
+                        values = l
+
 
                 else:
 
@@ -416,9 +415,9 @@ class Regresor(HyperParameterTuning):
         self.__function_transform = config["entrenamiento"]["regression"]["transformacion_logaritmica"]
 
         if self.__function_transform:
-            self.scorer = make_scorer(machine_learninge_utils.SMAPE, greater_is_better=False, transformation=self)
+            self.scorer = make_scorer(machine_learninge_utils.smape, greater_is_better=False, transformation=self)
         else:
-            self.scorer = make_scorer(machine_learninge_utils.SMAPE, greater_is_better=False)
+            self.scorer = make_scorer(machine_learninge_utils.smape, greater_is_better=False)
 
         self.__usar_pipeline_y = False
         arrayPipeline = []
@@ -428,7 +427,7 @@ class Regresor(HyperParameterTuning):
         if self.__function_transform:
             self.__usar_pipeline_y = True
             arrayPipeline.append(("log", preprocessing.FunctionTransformer \
-                (func=funcionesMatematicas.log_1, inverse_func=funcionesMatematicas.exp_1)))
+                (func=np.log1p, inverse_func=np.expm1)))
 
         if self.__usar_pipeline_y:
             self.__pipeline_y = Pipeline(arrayPipeline)
@@ -457,8 +456,8 @@ class Regresor(HyperParameterTuning):
     def metrics(self):
 
         mape = mean_absolute_percentage_error(self.y_test, self.y_pred)
-        smape = machine_learninge_utils.SMAPE(self.y_test, self.y_pred)
-        return {"mape": mape, "smape": smape}
+        smape = machine_learninge_utils.smape(self.y_test, self.y_pred)
+        return {"MAPE": mape, "SMAPE": smape}
 
     def predict(self, X_test=None, y_test=None):
         """

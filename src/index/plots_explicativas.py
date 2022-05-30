@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 import logging
+import os
+os.chdir("../../")
 logging.getLogger('matplotlib.font_manager').disabled = True
-from config import load_config
+from utils import load_config
 import pandas as pd
 from functions import obtener_variables_predictoras
 import numpy as np
@@ -22,7 +24,7 @@ if __name__ == '__main__':
 
         config = load_config.config()
         plot = config["entrenamiento"]["plot"]
-        df = pd.read_csv("../data/preprocesed/dataFIFA.csv")
+        df = pd.read_csv("data/preprocesed/dataFIFA.csv")
         df=df.loc[(df.Wage>0) & (df.Value>0)]
         feature="Wage"
         columnas = obtener_variables_predictoras.obtenerVariablesPredictoras(feature)

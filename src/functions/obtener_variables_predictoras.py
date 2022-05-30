@@ -1,6 +1,6 @@
 import yaml
 
-file_config = open('../config/config.yaml')
+file_config = open('config/config.yaml')
 config = yaml.load(file_config, Loader=yaml.FullLoader)
 
 

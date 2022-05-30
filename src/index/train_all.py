@@ -1,28 +1,27 @@
-import os.path
-import sys
 
+import os
+os.chdir("../../")
 import pandas as pd
-from config import load_config
+from utils import load_config
 from functions import obtener_variables_predictoras, entrenamiento
-import numpy as np
 from functions import machine_learning
 import logging
 import pickle
 import warnings
 
 warnings.filterwarnings('ignore')
-logging.config.fileConfig('../logs/logging.conf')
+logging.config.fileConfig('logs/logging.conf')
 
 if __name__ == '__main__':
     logger = logging.getLogger('training')
     config = load_config.config()
     nombre_dir_modelos = config["nombre_dir_modelos_pruebas"]
 
-    df = pd.read_csv("../data/preprocesed/dataFIFA.csv", index_col=0)
+    df = pd.read_csv("data/preprocesed/dataFIFA.csv", index_col=0)
 
     features_tipo = {
-        # "Wage": machine_learning.Regresor,
-        # "Value": machine_learning.Regresor,
+        #"Wage": machine_learning.Regresor,
+        #"Value": machine_learning.Regresor,
         "PositionGrouped": machine_learning.Clasificador,
         "PositionSinLado": machine_learning.Clasificador,
         "Position": machine_learning.Clasificador
@@ -55,7 +54,7 @@ if __name__ == '__main__':
                     if feature == "Wage":
                         df = df.loc[df.Wage != 1000]
 
-                modelo_encapsulado, X_train, X_test, y_train, y_test = entrenamiento.ejecutarModelo(
+                modelo_encapsulado, X_train, X_test, y_train, y_test = entrenamiento.entrenar_modelo(
                     nombre_modelo, feature, tipo_modelo, df,
                     variables)
 

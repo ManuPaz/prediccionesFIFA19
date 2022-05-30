@@ -1,34 +1,33 @@
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, make_scorer
+
 import numpy as np
 from functions import machine_learning
 from utils import report_model_results
 
 
-def get_train_test(X, y, train_size=0.7, shuffle=False):
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        train_size=float(train_size),
-        random_state=1234,
-        shuffle=shuffle
-    )
-    return X_train, X_test, y_train, y_test
 
 
 def parameter_search(modelo_encapsulado, param_grid, X_train, y_train, scorer, n_iter=10, cv=10, tipo="random"):
     """
     Optmizacion de parametros
-    :param modelo: modelo de sklearn
+    :param modelo_encapsulado: objeto que encapsula modelo
+    :type: HyperParameterTuning
     :param param_grid: espacio de parametros
+    :type: dict
     :param X_train:
+    :type: pandas dataframe
     :param y_train:
+    :type: pandas dataframe o pandas series
     :param scorer: scorer con la metrica que se quiere optimizar
+    :type: callable
     :param n_iter: número de iteraciones (necesario solo para random search)
+    :type: int
     :param cv: número de grupos de cross validation
+    :type: int
     :param tipo: random o grid
+    :type: str
     :return: parametros seleccionados
+    :type: dict
     """
     modelo = modelo_encapsulado.modelo()
     if tipo == "random":
@@ -41,12 +40,10 @@ def parameter_search(modelo_encapsulado, param_grid, X_train, y_train, scorer, n
     # guardar los resultados de cross validation en un archivo
     for i, combinacion in enumerate(search.cv_results_["params"]):
 
-        resultado = {}
-
-        resultado["parametros_optimizados"] = combinacion
-        resultado["parametros_fijos_no_por_defecto"] = modelo_encapsulado.params
-        resultado["normalizacion_X"] = modelo_encapsulado.normalize_X
-        resultado["reduccionDimensionalidad"] = modelo_encapsulado.dimension_reduction
+        resultado = {"parametros_optimizados": combinacion,
+                     "parametros_fijos_no_por_defecto":modelo_encapsulado.params,
+                     "normalizacion_X":modelo_encapsulado.normalize_X,
+                     "reduccionDimensionalidad":modelo_encapsulado.dimension_reduction}
 
         if isinstance(modelo_encapsulado, machine_learning.Regresor):
             resultado["SMAPE"] = -search.cv_results_["mean_test_score"][i]
@@ -63,11 +60,13 @@ def parameter_search(modelo_encapsulado, param_grid, X_train, y_train, scorer, n
     return params
 
 
-def SMAPE(real, fitted, transformation=None):
+def smape(real, fitted, transformation=None):
     """
 
-    :param real:
-    :param fitted:
+    :param real: valores reales de y
+    :type: pandas series o numpy array
+    :param fitted: predicciondes de y
+    :type: pandas series o numpy array
     :param transformation: para cuando se llame a este  metodo con el make_scorer en el random search
         si random_search trabaja con datos transformados  aqui se hace la inversa para usar la metrica sobre los originales
         vale para cualquier otro caso en que no se quieran mandar los datos ya transformados a los originales

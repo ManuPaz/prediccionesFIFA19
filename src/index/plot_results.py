@@ -1,32 +1,33 @@
 import pickle
 
 import seaborn
-from IPython.core.pylabtools import figsize
-import plotly.express as px
-from config import load_config
+from utils import load_config
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
+from matplotlib.colors import LogNorm
 import warnings
 import numpy as np
-
+import os
+os.chdir("../../")
 # con la opcion heatmat se hace el plot con imshow y se añaden etiquetas de texto (para clasificacion)
 #con seaborn se hace el plot con displot con escala de verdes y sin texto (para clasificacion)
 PLOT = "heatmap"
 #si hacer plots de regresion o no
 plot_regression = True
-
+#si hacer histograma dos 2d para la regresion en vez del grafico de dispersion
+hist_2d_regresion=True
 #si usar el dataframe entero o solo la parte de validacion
-dataframe_completo = True
+dataframe_completo = False
 
 #para hacer el plot solo con los datos mas concetrados en la regresion
 eliminar_valores_altos = True
+
 #valores para xlim y ylim de los plots de regresion
 maximos_plot = {"Wage": 80000, "Value": 300000}
 warnings.filterwarnings("ignore")
 if __name__ == "__main__":
-    df = pd.read_csv("../data/preprocesed/dataFIFA.csv")
+    df = pd.read_csv("data/preprocesed/dataFIFA.csv")
     config = load_config.config()
     nombre_dir_modelos = config["nombre_dir_modelos"]
     if dataframe_completo:
@@ -35,7 +36,8 @@ if __name__ == "__main__":
     else:
         nombre_dir_plots = config["nombre_dir_reportes_plots_test"]
 
-    for tipo in ["regression", "regresion_sin_valores_altos", "classification", "classification_sin_texto"]:
+    for tipo in ["regression", "regresion_sin_valores_altos","regresion_histogramas_2d",
+                 "classification", "classification_sin_texto"]:
         if not os.path.isdir(nombre_dir_plots + tipo):
             os.makedirs(nombre_dir_plots + tipo)
 
@@ -74,12 +76,16 @@ if __name__ == "__main__":
             modelo_encapsulado.predict(X, y)
             y_pred = modelo_encapsulado.y_pred.reshape(-1)
             print(modelo_encapsulado.metrics())
-
+            titulo="Real vs prediccion: variable {}, modelo {}".format(feature, modelo)
             if tipo == "regression" and plot_regression:
-
-                ax = sns.scatterplot(y, y_pred, color="green")
-                figure = ax.get_figure()
-                plt.title("Real vs prediccion: variable {}, modelo {}".format(feature, modelo))
+                if hist_2d_regresion:
+                    figure, ax = plt.subplots()
+                    plt.hist2d(y, y_pred, cmap='Spectral', norm=LogNorm(), bins=100)
+                    plt.colorbar()
+                else:
+                    ax = sns.scatterplot(y, y_pred, color="green")
+                    figure = ax.get_figure()
+                plt.title(titulo)
                 plt.xlabel("Real")
                 plt.ylabel("Prediccion")
                 if eliminar_valores_altos:
@@ -97,14 +103,15 @@ if __name__ == "__main__":
 
                 if PLOT == "heatmap":
 
-                    cm = modelo_encapsulado.confusion_matrix()
+                    cm = modelo_encapsulado.confusion_matrix().transpose()
                     figure, ax = plt.subplots()
 
                     im = ax.imshow(cm, cmap=plt.get_cmap("cool"))
                     ax.set_xticks(np.arange(len(cm.index)), labels=cm.index)
                     plt.setp(ax.get_xticklabels(), rotation=90, ha="right", rotation_mode="anchor")
                     ax.set_yticks(np.arange(len(cm.index)), labels=cm.index)
-                    plt.title("Real vs prediccion: variable {}, modelo {}".format(feature, modelo))
+                    plt.title(titulo)
+
                     plt.xlabel("Real", labelpad=0.2)
                     plt.ylabel("Prediccion")
 
@@ -115,23 +122,24 @@ if __name__ == "__main__":
 
                 if PLOT == "seaborn":
 
-                    g = seaborn.displot(data=df_results, x="y", y="y_pred", color="green", rug=True)
+                    g = seaborn.displot(data=df_results, x="y", y="y_pred", color="green", rug=True, cbar=True)
                     clases = modelo_encapsulado.modelo.classes_
                     for ax in g.axes.flat:
                         for label in ax.get_xticklabels():
                             label.set_rotation(90)
-                    plt.title("Real vs prediccion: variable {}, modelo {}".format(feature, modelo))
+                    plt.title(titulo)
                     plt.xlabel("Real")
                     plt.ylabel("Prediccion")
 
                     g.savefig(nombre_dir_plots + tipo + "_sin_texto/" + feature + "_" + modelo + ".jpg")
-                    # fig = px.density_heatmap(df_results, x="y", y="y_pred", text_auto=True)
+
 
             if (tipo == "regression" and plot_regression) or (tipo == "classification" and PLOT != "seaborn"):
                 nombre_subirectorio=tipo
                 if tipo == "regression" and eliminar_valores_altos:
                     nombre_subirectorio = "regresion_sin_valores_altos"
-
+                if tipo == "regression" and hist_2d_regresion:
+                    nombre_subirectorio = "regresion_histogramas_2d"
                 figure.savefig(nombre_dir_plots + nombre_subirectorio + "/" + feature + "_" + modelo + ".jpg")
 
-                plt.show()
+            plt.show()

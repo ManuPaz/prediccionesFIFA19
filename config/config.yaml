@@ -71,13 +71,13 @@ variables_predictoras:
 forecasting:
   todos_los_modelos: False #mostrar las predicciones con todos los modelos o solo el mejor
 
-nombre_dir_modelos: "../assets/modelosFinales/"
-nombre_dir_mejores_modelos: "../assets/mejoresModelos/"
-nombre_dir_modelos_pruebas: "../assets/pruebasModelos/"
-nombre_dir_reportes_cv: "../reports/resultados_entrenamiento_cv/"
-nombre_dir_reportes_finales: "../reports/resultados_finales/"
-nombre_dir_reportes_plots_all: "../reports/plots/all/"
-nombre_dir_reportes_plots_test: "../reports/plots/test/"
+nombre_dir_modelos: "assets/modelosFinales/"
+nombre_dir_mejores_modelos: "assets/mejoresModelos/"
+nombre_dir_modelos_pruebas: "assets/pruebasModelos/"
+nombre_dir_reportes_cv: "reports/resultados_entrenamiento_cv/"
+nombre_dir_reportes_finales: "reports/resultados_finales/"
+nombre_dir_reportes_plots_all: "reports/plots/all/"
+nombre_dir_reportes_plots_test: "reports/plots/test/"
 entrenamiento:
 
   reportar_entrenamiento: True #para guardar o no el reporte del entrenamiento
@@ -85,7 +85,7 @@ entrenamiento:
   plot: True #variable para hacer plots o no durante el entrenamiento
   random_seed: 10
   train_test_split: 0.7
-  optimizar: False
+  optimizar: True
 
   entrenamiento_multiple_random: False #si entrenar un modelo con parametros ya fijos
   #utilizando  multiples separaciones train-validation para ver la consitencia del modelo en las predicciones en validacion
@@ -96,8 +96,8 @@ entrenamiento:
   scale_X: False #para activar max-min scaler
   reducir_dimensionalidad: False #usar pca para reducir la dimensionalidad
 
-  feature_clasificacion: "Position"  # variable que se quiere predecir con el modelo de clasificacion
-  feature_regresion: "Value"  #variable que se quiere predecir con el modelo de regresion
+  feature_clasificacion: "PositionGrouped"  # variable que se quiere predecir con el modelo de clasificacion
+  feature_regresion: "Wage"  #variable que se quiere predecir con el modelo de regresion
 
   features_regresion: ["Value", "Wage"]
   features_clasificacion: ["Position","PositionGrouped","PositionSinLado"]
@@ -111,7 +111,7 @@ entrenamiento:
   classification: #parametros exclusivos de clasificacion
     multi_class_score: "macro" #forma de computar las metricas con multi clase. Micro agrega todas las clases
                                 #y macro calcula clase a clase y hace la media
-    modelos : [ "gradient_boosting", "ada_boosting"
+    modelos : [ "linear_SVC"
                 ] #modelos a utilizar en train_all para clasificacion
 
     todos: [ "random_forest",
@@ -131,7 +131,7 @@ entrenamiento:
         solver: ["svd","lsqr", "eigen"]
 
       linear_SVC:
-        C: [ 0.1, 5, 0.3 ]
+        C: [ 1,2,3 ]
       gradient_boosting:
         max_depth: [ 3,6,9,12 ] #default 3
         n_estimators: [ 100 ] #default 100
@@ -153,20 +153,20 @@ entrenamiento:
         logistic:
           multi_class: "ovr"
         random_forest:
-          min_samples_split: 2
-          max_depth: 20
-          n_estimators: 100
+          min_samples_split: 18
+          #max_depth: 20
+          n_estimators: 50
         k_neighbors:
           weights:  "uniform"
-          n_neighbors: 30
+          n_neighbors: 40
 
         lda:
-          shrinkage: 0.1
+          #shrinkage: 0.1
           solver: "lsqr"
         SVC:
-           C: 0.6
+           C: 2.1
            gamma: "scale"
-           kernel: "linear"
+           kernel: "rbf"
 
 
         gradient_boosting:
@@ -174,7 +174,7 @@ entrenamiento:
           n_estimators: 100 #default 100
           learning_rate:  0.1  #default 0.1
         ada_boosting: #por defecto usa como estimador base decission tree con max_depth=1
-          n_estimators:  100  # default 50
+          n_estimators:  10  # default 50
           learning_rate: 0.1  #default 1
 
 
@@ -188,7 +188,7 @@ entrenamiento:
 
 
 
-    modelos: [ "k_neighbors"] #modelos a probar en train_all
+    modelos: [ "elastic_net"] #modelos a probar en train_all
 
     todos: [ "ridge", "lasso", "linear",
               "k_neighbors", "random_forest",
@@ -228,27 +228,27 @@ entrenamiento:
     params: #parametros fijos
       k_neighbors:
           metric: "minkowski"
-          n_neighbors: 10
+          n_neighbors: 20
           weights: "uniform"
 
       random_forest:
         n_estimators: 100
-        min_samples_split: 10
-        max_depth:  None
+        min_samples_split: 2
+        max_depth:  10
 
       gradient_boosting:
         learning_rate: 0.05 #default 0.1
         max_depth: 10
-        n_estimators: 150
+        n_estimators: 140
 
       linear_SVR:
         C: 0.5
 
       SVR:
-        C: 2.1
+        C: 1.0
         kernel:  "rbf"
         gamma:  "scale"
-        epsilon: 0.1
+        epsilon: 0.06
       elastic_net:
         l1_ratio: 0.95
 
