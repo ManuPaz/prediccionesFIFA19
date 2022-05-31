@@ -24,7 +24,7 @@ dataframe_completo = False
 eliminar_valores_altos = True
 
 #valores para xlim y ylim de los plots de regresion
-maximos_plot = {"Wage": 80000, "Value": 300000}
+maximos_plot = {"Wage": 20000, "Value": 300000}
 warnings.filterwarnings("ignore")
 if __name__ == "__main__":
     df = pd.read_csv("data/preprocesed/dataFIFA.csv")

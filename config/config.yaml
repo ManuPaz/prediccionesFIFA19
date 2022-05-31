@@ -78,6 +78,7 @@ nombre_dir_reportes_cv: "reports/resultados_entrenamiento_cv/"
 nombre_dir_reportes_finales: "reports/resultados_finales/"
 nombre_dir_reportes_plots_all: "reports/plots/all/"
 nombre_dir_reportes_plots_test: "reports/plots/test/"
+nombre_dir_tablas: "reports/resultados_csv/"
 entrenamiento:
 
   reportar_entrenamiento: True #para guardar o no el reporte del entrenamiento

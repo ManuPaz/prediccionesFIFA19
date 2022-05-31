@@ -17,7 +17,7 @@ if __name__ == '__main__':
     nombre_dir_modelos = config["nombre_dir_modelos"]
     df = pd.read_csv("data/preprocesed/dataFIFA.csv", index_col=0)
     nombre_modelo = "ridge"
-    MODELOS = ["ridge", "lasso"]
+    MODELOS = ["linear"]
     for nombre_modelo in MODELOS:
         feature = config["entrenamiento"]["feature_regresion"]
         df = df.loc[(df[feature] > 0)]
