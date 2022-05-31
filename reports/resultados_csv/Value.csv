@@ -1,0 +1,10 @@
+modelo,SMAPE en train set,SMAPE en validation set,MAPE en train set,MAPE en validation set
+SVR,0.194,0.24,0.248,0.305
+lasso,0.291,0.291,0.371,0.37
+ridge,0.291,0.292,0.37,0.37
+linear,0.291,0.292,0.37,0.37
+k_neighbors,0.327,0.359,0.41,0.457
+random_forest,0.121,0.234,0.132,0.297
+gradient_boosting,0.06,0.23,0.06,0.288
+linear_SVR,0.283,0.285,0.399,0.399
+elastic_net,0.291,0.291,0.371,0.37

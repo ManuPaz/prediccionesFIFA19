@@ -8,13 +8,16 @@ import pandas as pd
 from functions import obtener_variables_predictoras
 import numpy as np
 def scatter(X,columna,y, feature, transform=None ):
-    plt.figure(figsize=(15, 15))
-    titulo = feature + " vs " + columna
+    plt.figure(figsize=(8, 8))
+
     if transform is not None:
         y=transform(y)
-        titulo+= " "+str(transform)
+        titulo = "Log("+feature+")" + " vs " + columna
+    else:
+        titulo =  feature  + " vs " + columna
 
-    plt.scatter(X[columna], y)
+
+    plt.scatter(X[columna], y,color="green")
 
     plt.title(titulo)
     plt.xlabel(columna)
@@ -25,9 +28,9 @@ if __name__ == '__main__':
         config = load_config.config()
         plot = config["entrenamiento"]["plot"]
         df = pd.read_csv("data/preprocesed/dataFIFA.csv")
-        df=df.loc[(df.Wage>0) & (df.Value>0)]
-        feature="Wage"
-        columnas = obtener_variables_predictoras.obtenerVariablesPredictoras(feature)
+        df=df.loc[(df.Wage>1000) & (df.Value>0)]
+        feature="Value"
+        columnas = obtener_variables_predictoras.obtenerVariablesPredictoras("todas")
         X=df.loc[:,columnas]
 
         if plot:

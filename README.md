@@ -129,17 +129,13 @@ variables a predecir, y se repitieron los resultados.<br> También se intentó r
 pero también se obtuvieron peores resultados.<br>
 Por ese motivo a partir de ese momento se trabajó con todas las variables para entrenar a los modelos. 
 
-<br><br>
-En cuanto a la transformación de la variable a predecir en los casos de regresión, se obtuvieron resultados considerablemente mejores para todos los modelos utilizando la transformación logarítimica frente a utilizar los datos brutos, por eso
-se profundizó en la optimización de parámetros utilizando esta transformación.
-A pesar de la transformación, las metricas siempre se calculan sobre la variable original, en caso de transformar se hace la transformacion inversa antes de calcular las metricas. 
+
 <br><br>
 Por otra parte, se normalizó el dataframe de variables explicativas pues nunca empeoraban los resultados y en algunos modelos mejoraban considerablemente.
 <br><br>
 Para todos los modelos se realizó optimización de parámetros realizando búsqueda de tipo random y después se realizó búsqueda de tipo grid para los modelos que 
 obtuvieron mejores resultados acercándose a los parámetros con los que se obtuvieron las mejores métricas.
 <h3>Regresión </h3>
-Los modelos de regresión utilizados se indican en las siguientes tablas con las métricas obtenidos para predecir el Salario y Valor de mercado (cada modelo con los parámetros seleccionados en  cross validation).
 
 Para la selección de los parámetros en cross validation se utilizó la métrica SMAPE. La ventaja frente al MAPE es que penaliza lo mismo predicciones altas frente a valores reales bajos 
 que predicciones bajas frente a valores reales altos, mientras que en el MAPE las predicciones altas penalizan mucho más puesto que se divide solo entre en el valor real.
@@ -154,6 +150,22 @@ En los mejores modelos incluyendo los jugadores sin equipo empeora el modelo, y 
 Para la predicción de salario se eliminaron los jugadores de salario 1000, pues había 4873 jugadores con ese salario exacto, lo cual hace
 pensar que se asigna por otros motivos que no tienen que ver con las características, e incluyéndolo empeora bastante el modelo (el SMAPE empeora un 6%).
 
+<br><br>
+En cuanto a la transformación de la variable a predecir, se obtuvieron resultados considerablemente mejores para todos los modelos utilizando la transformación logarítimica frente a utilizar los datos brutos, por eso
+se profundizó en la optimización de parámetros utilizando esta transformación.
+A pesar de la transformación, las metricas siempre se calculan sobre la variable original, en caso de transformar se hace la transformacion inversa antes de calcular las metricas. 
+El hecho de que entrenar el modelo con las variables transformadas podría mejorar las predicciones se ve al hacer los gráficos de dispersión de las variables a predecir frente a las explicativas. 
+A continuación se muestran algunos de los ejemplos más claros, para el salario y el valor de mercado.
+<h5> Valor de mercado frente a variable explicativa  </h5>
+<img height="400" src="reports/plots/plots_explicativas/regresion_value.png"  width="500"/>
+<h5>Logaritmo de Valor de mercado frente a variable explicativa  </h5>
+<img height="400" src="reports/plots/plots_explicativas/regresion_value_log.png"  width="500"/>
+<h5> Salario frente a variable explicativa  </h5>
+<img height="400" src="reports/plots/plots_explicativas/regresion_wage.png"  width="500"/>
+<h5>Logaritmo de Salario frente a variable explicativa  </h5>
+<img height="400" src="reports/plots/plots_explicativas/regresion_wage_log.png"  width="500"/>
+<br><br>
+Los modelos de regresión utilizados se indican en las siguientes tablas con las métricas obtenidos para predecir el Salario y Valor de mercado (cada modelo con los parámetros seleccionados en  cross validation).
 <h4> Valor de mercado </h4>
 
 | modelo                |SMAPE en train set|SMAPE en validation set|MAPE en train set|MAPE en validation set|
@@ -320,15 +332,19 @@ acertando la posición pero fallando en el lado.
 
 En el caso de la clasificación, vemos la diferencia de accuracy en los tres niveles de agrupación. <br><br>
 Para la posición original la mejor accuracy es de 0.61, para la posición eliminado el lado es de 0.752 y para la agrupación en 
-4 posiciones es de 0.871.  <br>
-En los tres casos el mejor modelo es el SVC con kernel linear.<br><br> Lo primero que quiere decir esto es que los datos se pueden separar
+4 posiciones es de 0.871.  <br><br>
+En los tres casos el mejor modelo es el SVC con kernel linear.<br>Lo primero que quiere decir esto es que los datos se pueden separar
 usando hiperplanos en las  dimensiones utilizadas. 
-Esto se podía intuir al ver los gráficos de las diferentes carácterísticas frente a media global
-(que se usó como variable explicativa )y con el color correspondiente a  la posición agrupada. Se puede ver que con ciertas variables 
-las posiciones se pueden separar linealmente. Si esto ocurre para más variables, entonces usando las aproximadamente 40 dimensiones de las 
-que disponemos, las 4 posiciones se podrán separar linealmente e incluso las 27 originales.
-<br><br>
-Se puede ver que los resultados varían un poco de utilizar el modelo LinearSVC de sklearn frente al modelo SVC de sklearn con parámetro
+Esto se podía intuir al ver los gráficos  de dispersión de las diferentes carácterísticas dos a dos y con el color correspondiente a  la posición agrupada. Se puede ver que con ciertas variables 
+las posiciones se pueden separar linealmente. 
+
+<h5> Separación lineal de las posiciones </h5>
+<img height="400" src="reports/plots/plots_explicativas/separacion_posiciones.png"  width="500"/>
+
+En este caso usamos las variables <b>Overall</b> y <b>SldingTackle</b> como ejemplo en el gráfico, pero ocurre para más variables, lo que explica 
+el buen funcionamiento del kernel lineal.
+<br><br><br>
+En cuanto a las métricas obtenidas, se puede ver que los resultados varían un poco de utilizar el modelo LinearSVC de sklearn frente al modelo SVC de sklearn con parámetro
 kernel  linear porque utilizan implementaciones difererentes.
 <br><br>
 Con Random Forest y Gradient Boosting también se consiguen buenos resultados por los mismos motivos que en la regresión,
@@ -373,7 +389,7 @@ Al margen de esto, vemos que la mayor parte de los datos están en la diagonal, 
 <h5> Histograma 2d con los datos de validación para Valor de mercado infereriore a 300000 euros </h5>
 <img height="400" src="reports/plots/test/classification/PositionGrouped_SVC.jpg"  width="500"/>
 
-Al agrupar en las 4 posiciones las predicciones mejorán notablemente, consiguiendo una accuracy del 86%. Vemos que casi todos los datos esán en la diagonal,
+Al agrupar en las 4 posiciones las predicciones mejorán notablemente, consiguiendo una accuracy del 87%. Vemos que casi todos los datos esán en la diagonal,
  no hay confusiones entre delantero y defensa y los fallos más numerosos son los de delanteros que se predicen como medios.
 
 

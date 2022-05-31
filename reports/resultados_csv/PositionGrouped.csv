@@ -1,0 +1,9 @@
+modelo,accuracy en train set,accuracy en validation set
+random_forest,0.859,0.859
+gradient_boosting,0.86,0.86
+ada_boosting,0.58,0.58
+linear_SVC,0.865,0.865
+logistic,0.866,0.866
+k_neighbors,0.849,0.849
+lda,0.853,0.853
+SVC,0.871,0.871
