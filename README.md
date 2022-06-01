@@ -280,7 +280,7 @@ Como explicamos antes, se mejoran bastante las predicciones agrupando los jugado
 Igual que para regresión, se muestran las métricas obtenidas para predecir cada variable (la posición con diferentes agrupamientos).
 <br>Como comentamos antes, se utilizaron todas las variables explicativas que se indican en la sección <b> Variables a predecir y explicativas </b>,
 y además se incluyo una variable binaria adicional para predecir la posición cuando no se agrupó eliminando el lado. Esta variable es el pie bueno de jugador, que ayuda a diferenciar
-el lado e hizo que mejorase la **Accuracy** (pasó de ser 0.51 a 0.61 en el mejor modelo), y se utilizó porque se observó en la matriz de confusión que se cometían muchos errores 
+el lado e hizo que mejorase la *Accuracy* (pasó de ser 0.51 a 0.61 en el mejor modelo), y se utilizó porque se observó en la matriz de confusión que se cometían muchos errores 
 acertando la posición pero fallando en el lado.
 
 <h4>Posición sin agrupamiento </h4>
@@ -323,7 +323,7 @@ acertando la posición pero fallando en el lado.
 | SVC  |0.871                |0.871                     | kernel=rbf,  C=2.1,   ganma=scale                |
 
 En el caso de la clasificación, vemos la diferencia de *Accuracy* en los tres niveles de agrupación. <br><br>
-Para la posición original la mejor **Accuracy** es de 0.61, para la posición eliminado el lado es de 0.752 y para la agrupación en 
+Para la posición original la mejor *Accuracy* es de 0.61, para la posición eliminado el lado es de 0.752 y para la agrupación en 
 4 posiciones es de 0.871.  <br><br>
 En los tres casos el mejor modelo es el SVC, en dos casos con kernel linear y para las posiciones agrupadas con kernel rbf, pero realmente para este caso se obtuvieron resultados
 muy similares con kernel linear.
@@ -359,35 +359,35 @@ mejor modelo para cada variable, utilizando solo los datos de validación.
 <img height="700" src="reports/plots/test/classification/Position_SVC.jpg"  width="700"/>
 
 A pesar de tener 27 clases se ve que las predicciones son bastante buenas, ya que en muchas posiciones los valores de la diagonal
-cubren bastante parte de  la frecuencia marginal, tanto mirando las filas como las columnas (recordemos que la **Accuracy** era de 0.61). 
+cubren bastante parte de  la frecuencia marginal, tanto mirando las filas como las columnas (recordemos que la *Accuracy* era de 0.61). 
 <br><br>Además, hay algunos fallos que se deben precisamente a no haber eliminado el lado como las confusiones de central derecho (RCB) e izquierdo (LCB)
 con central (CB) (todos se predicen como central) lo cual es lógico porque tienen las mismas características.
 <br>Otras confusiones son entre medio izquierdo (LM) y medio derecho (DM) entre ambas pero no con medio centro (MC), o las de medio centro derecho
 (RCM) y medio centro izquierdo  (LCM ) que se predicen como medio centro (MC). Por este motivo a la hora de agrupar se juntaron LCM Y RCM con CM, y por otro lado 
 LM y DM.
 <br><br>
-En cuanto a las que se predicen bien, portero (GK) se predice perfecto, tendría **Recall** ( TP/(TP+FN))  y **Precission** (TP/(TP+FP)) del 100%. 
+En cuanto a las que se predicen bien, portero (GK) se predice perfecto, tendría *Recall* ( TP/(TP+FN))  y *Precission (TP/(TP+FP)) del 100%. 
 <br>Lateral derecho (RB)
 e izquierdo (LB) también se predicen bien. Posteriormente se agruparon con central para no tener posiciones donde se incluyese el lado, 
 pero serían las únicas que se podrían mantener separadas.
-<br>Hay posiciones que tienen *Recall* muy alta y **Precission** no tan alta como central (CB), medio centro (MC) o delantero centro (ST).
+<br>Hay posiciones que tienen *Recall* muy alta y *Precission no tan alta como central (CB), medio centro (MC) o delantero centro (ST).
 <br><br>
 <h5> Variable: Posición eliminando el lado. Usando modelo SVC con kernel lineal </h5>
 <img height="500" src="reports/plots/test/classification/PositionSinLado_SVC.jpg" width="500"/>
 
-Como ya vimos viendo la **Accuracy** al eliminar los lados las predicciones mejoran bastante (**Accuracy** del 75%).
+Como ya vimos viendo la *Accuracy* al eliminar los lados las predicciones mejoran bastante (*Accuracy* del 75%).
 <br><br>Vemos que al agrupar centrales y laterales en cetral (los únicos defensas que quedan fuera son los carrileros) hay muchos jugadores en
 la posición CB y esto podría hacer que muchos jugadores se predijesen como central, por lo que hay que fijarse mucho
-en la **Precission** para esta clase y el **Recall** para las otras, ya que cuando hay una clase 
-dominante se puede llegar a obtener buena **Accuracy** prediciendo mucho esa clase.<br><br> Sin ambargo en este caso vemos que la precisión de CB es alta, 
+en la *Precission para esta clase y el *Recall* para las otras, ya que cuando hay una clase 
+dominante se puede llegar a obtener buena *Accuracy* prediciendo mucho esa clase.<br><br> Sin ambargo en este caso vemos que la precisión de CB es alta, 
 no hay muchos casos en los que se prediga CB siendo otra clase.
-Al margen de esto, vemos que la mayor parte de los datos están en la diagonal, lo que suponíamos por la **Accuracy**.
+Al margen de esto, vemos que la mayor parte de los datos están en la diagonal, lo que suponíamos por la *Accuracy*.
 
 
 <h5> Histograma 2d con los datos de validación para <b>Valor de mercado </b> infererior a 300000 euros </h5>
 <img height="400" src="reports/plots/test/classification/PositionGrouped_SVC.jpg"  width="500"/>
 
-Al agrupar en las 4 posiciones las predicciones mejorán notablemente, consiguiendo una **Accuracy** del 87%. Vemos que casi todos los datos están en la diagonal,
+Al agrupar en las 4 posiciones las predicciones mejorán notablemente, consiguiendo una *Accuracy* del 87%. Vemos que casi todos los datos están en la diagonal,
  no hay confusiones entre delantero y defensa y los fallos más numerosos son los de delanteros que se predicen como medios.
 
 
