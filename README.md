@@ -3,7 +3,7 @@
 Comparación de  diferentes modelos de regresión y clasificación para predecir diferentes variables de los jugadores del FIFA 19.
 ## VARIABLES A PREDECIR Y VARIABLES EXPLICATIVAS
 Las variables que se quieren predecir son las siguientes:
-* **Valor de mercado del jugador (regresión).**
+* **<b>Valor de mercado </b> del jugador (regresión).**
 * **Sueldo del jugador (regresión).**
 * **Posición del jugador (clasificación).** Dentro de la posición del jugador, se intentó predecir esta sin agrupar y agrupando con varios niveles de agrupación,
 puesto que originalmente hay 27 posiciones posibles, algunas con pocos datos.
@@ -56,7 +56,7 @@ Las variables explicativas disponibles son las características de los jugadores
 * InternationalReputation
 * Finishing
 * GKKicking
-* HeadingAccuracy
+* Heading*Accuracy*
 * Aggression
 * LongPassing
 * GKHandling
@@ -68,7 +68,7 @@ Las variables explicativas disponibles son las características de los jugadores
 * Positioning
 * SkillMoves
 * Dribbling
-* FKAccuracy
+* FK*Accuracy*
 * Marking
 * Balance
 * Curve
@@ -90,7 +90,7 @@ se muestran las predicciones (con el mejor modelo o todos) y el valor real.
 * **train_one_model_regression**. Para entrenar un solo modelo de regresión sobre una variable.
 * **train_one_model_clasificacion**. Para entrenar un solo modelo de clasificación sobre una variable.
 * **plots_results**. Para visualizar las predicciones: predicción vs valor real usando gráficos de dispersión o histogramas 2d.
-* **plots_explicativas**  Para visualizar los valores de <b>Salario</b> y <b>Valor de mercado</b> frente a las explicativas. De estas visualizaciones podemos pensar que
+* **plots_explicativas**  Para visualizar los valores de <b><b>Salario</b></b> y <b><b>Valor de mercado </b></b> frente a las explicativas. De estas visualizaciones podemos pensar que
 quizás sea útil utilizar una transformación logarítimica sobre ambas variables para predecirlas.
 
 En <b>reports/</b> están almacenados diferentes reportes:
@@ -104,7 +104,7 @@ y transformaciones sobre los datos).
   * **classification_sin_texto/**. Gráficos de densidad con escala de color.
   * **regression/**.  En los modelos de regresión se usan gráficos de dispersión.
   * **regresion_sin_valores_altos/**. Gráficos de dispersión eliminando los valores más altos para ver los datos más concetrados en una mejor escala.
-  * **regresion_histogramas_2d/**. Histogramas 2D para regresión para ver lo que ocurre en las zonas de mayor densidad (especialmente para Salario).
+  * **regresion_histogramas_2d/**. Histogramas 2D para regresión para ver lo que ocurre en las zonas de mayor densidad (especialmente para <b>Salario</b>).
 
 En <b>assets/</b> se guardan objetos de python que tienen toda la información de los entrenamientos, incluyendo el modelo de sklearn, para usarlos más tarde.
 En el directorio <b>mejoresModelos</b> se guarda el objeto con el modelo seleccionado para cada variable.
@@ -134,46 +134,46 @@ Para todos los modelos se realizó optimización de parámetros realizando búsq
 obtuvieron mejores resultados acercándose a los parámetros con los que se obtuvieron las mejores métricas.
 <h3>Regresión </h3>
 
-Para la selección de los parámetros en cross validation se utilizó la métrica *SMAPE*. La ventaja frente al MAPE es que penaliza lo mismo predicciones altas frente a valores reales bajos 
+Para la selección de los parámetros en cross validation se utilizó la métrica *SMAPE*. La ventaja frente al *MAPE* es que penaliza lo mismo predicciones altas frente a valores reales bajos 
 que predicciones bajas frente a valores reales altos, mientras que en el *MAPE* las predicciones altas penalizan mucho más puesto que se divide solo entre en el valor real.
 
-Por otra parte, en este caso al ser una métrica relativa el *SMAPE* parecía una mejor opción frente al *MSE* puesto que los tanto los datos de Salario como los de Valor de Mercado tenían una distribución muy asimétrica con datos en escalas muy diferentes, 
+Por otra parte, en este caso al ser una métrica relativa el *SMAPE* parecía una mejor opción frente al *MSE* puesto que los tanto los datos de <b>Salario</b> como los de <b>Valor de mercado </b> tenían una distribución muy asimétrica con datos en escalas muy diferentes, 
 por lo que una métrica de error relativo parece más apropiada para seleccionar los modelos.
 <br><br>
-En cuanto al procesamiento de los datos, en ambas variables se eliminaron los jugadores que tenían un valor de 0. Estos son  jugadores sin equipo (los 229  que tienen Salario 0 , y solo hay 10 de 239 con Valor de mercado 0 que tienen equipo), entonces este es el motivo del valor de la variable y es imposible predecirlo usando las careaterísticas. 
+En cuanto al procesamiento de los datos, en ambas variables se eliminaron los jugadores que tenían un valor de 0. Estos son  jugadores sin equipo (los 229  que tienen <b>Salario</b> 0 , y solo hay 10 de 239 con <b>Valor de mercado </b> 0 que tienen equipo), entonces este es el motivo del valor de la variable y es imposible predecirlo usando las careaterísticas. 
 En los mejores modelos incluyendo los jugadores sin equipo empeora el modelo, y no se consigue mejorar incluyendo una nueva variable binaria que indique si el jugador tiene equipo o no.
 <br><br>
-Para la predicción de salario se eliminaron los jugadores de salario 1000, pues había 4873 jugadores con ese salario exacto, lo cual hace
+Para la predicción de <b>Salario</b> se eliminaron los jugadores de <b>Salario</b> 1000, pues había 4873 jugadores con ese <b>Salario</b> exacto, lo cual hace
 pensar que se asigna por otros motivos que no tienen que ver con las características, e incluyéndolo empeora bastante el modelo (el *SMAPE* empeora un 6%).
 <br><br>
 En cuanto a la transformación de la variable a predecir, se obtuvieron resultados considerablemente mejores para todos los modelos utilizando la transformación logarítimica frente a utilizar los datos brutos, por eso
 se profundizó en la optimización de parámetros utilizando esta transformación.
 A pesar de la transformación, las métricas siempre se calculan sobre la variable original, en caso de transformar se hace la transformación inversa antes de calcular las métricas. 
 El hecho de que entrenar el modelo con las variables transformadas podría mejorar las predicciones se ve al hacer los gráficos de dispersión de las variables a predecir frente a las explicativas. 
-A continuación se muestran algunos de los ejemplos más claros, para el salario y el valor de mercado.
-<h5> Valor de mercado frente a variable explicativa  </h5>
+A continuación se muestran algunos de los ejemplos más claros, para el <b>Salario</b> y el <b>Valor de mercado </b>.
+<h5> <b>Valor de mercado </b> frente a variable explicativa  </h5>
 <img height="400" src="reports/plots/plots_explicativas/regresion_value.png"  width="500"/>
-<h5>Logaritmo de Valor de mercado frente a variable explicativa  </h5>
+<h5>Logaritmo de <b>Valor de mercado </b> frente a variable explicativa  </h5>
 <img height="400" src="reports/plots/plots_explicativas/regresion_value_log.png"  width="500"/>
-<h5> Salario frente a variable explicativa  </h5>
+<h5> <b>Salario</b> frente a variable explicativa  </h5>
 <img height="400" src="reports/plots/plots_explicativas/regresion_wage.png"  width="500"/>
-<h5>Logaritmo de Salario frente a variable explicativa  </h5>
+<h5>Logaritmo de <b>Salario</b> frente a variable explicativa  </h5>
 <img height="400" src="reports/plots/plots_explicativas/regresion_wage_log.png"  width="500"/>
 <br><br>
-Los modelos de regresión utilizados se indican en las siguientes tablas con las métricas obtenidos para predecir el Salario y Valor de mercado (cada modelo con los parámetros seleccionados en  cross validation).
-<h4> Valor de mercado </h4>
+Los modelos de regresión utilizados se indican en las siguientes tablas con las métricas obtenidos para predecir el <b>Salario</b> y <b>Valor de mercado </b> (cada modelo con los parámetros seleccionados en  cross validation).
+<h4> <b>Valor de mercado </b> </h4>
 
-| modelo                |*SMAPE* en train set|*SMAPE* en validation set|MAPE en train set|MAPE en validation set| Parámetros modificados                                 |
-|-----------------------|------------------|-----------------------|-----------------|----------------------|--------------------------------------------------------|
-| SVR                   |0.194             |0.24                   |0.248            |0.305                 | kernel=rbf, ganma=scale, C=2.1, epsilon=0.1            |
-| regresión lasso       |0.291             |0.291                  |0.371            |0.37                  ||
-| regresión ridge       |0.291             |0.292                  |0.37             |0.37                  ||
-| regresión linear      |0.291             |0.292                  |0.37             |0.37                  ||
-| k_neighbors           |0.327             |0.359                  |0.41             |0.457                 | weights=distance, n_neighbors=10, metric=minkowski     |
-| random_forest         |0.121             |0.234                  |0.132            |0.297                 | n_estimators=100, min_samples_split=10, max_depth=None |
-| gradient_boosting     |0.06              |0.23                   |0.06             |0.288                 | learning_rate=0.05, max_depth=10, n_estimators=150     |
-| linear SVR            |0.283             |0.285                  |0.399            |0.399                 | C=0.5                                                  |
-| regresión elastic_net |0.291             |0.291                  |0.371            |0.37                  | l1_ratio=0.95                                          |
+| modelo                |*SMAPE* en train set|*SMAPE* en validation set| *MAPE* en train set | *MAPE* en validation set | Parámetros modificados                                 |
+|-----------------------|------------------|-----------------------|---------------------|--------------------------|--------------------------------------------------------|
+| SVR                   |0.194             |0.24                   | 0.248               | 0.305                    | kernel=rbf, ganma=scale, C=2.1, epsilon=0.1            |
+| regresión lasso       |0.291             |0.291                  | 0.371               | 0.37                     ||
+| regresión ridge       |0.291             |0.292                  | 0.37                | 0.37                     ||
+| regresión linear      |0.291             |0.292                  | 0.37                | 0.37                     ||
+| k_neighbors           |0.327             |0.359                  | 0.41                | 0.457                    | weights=distance, n_neighbors=10, metric=minkowski     |
+| random_forest         |0.121             |0.234                  | 0.132               | 0.297                    | n_estimators=100, min_samples_split=10, max_depth=None |
+| gradient_boosting     |0.06              |0.23                   | 0.06                | 0.288                    | learning_rate=0.05, max_depth=10, n_estimators=150     |
+| linear SVR            |0.283             |0.285                  | 0.399               | 0.399                    | C=0.5                                                  |
+| regresión elastic_net |0.291             |0.291                  | 0.371               | 0.37                     | l1_ratio=0.95                                          |
 
 Como podemos ver en la tabla, se consigue un *SMAPE* de 0.23 usando Gradient Boosting, y también se consiguen resultados muy similares con Random Forest y SVR con kernel RBF.
 
@@ -185,7 +185,7 @@ Aumentando el número mínimo de datos de un nodo para que se pueda dividir o re
 también empeora un poco en validación.
 <br><br>
 También se obtienen buenos resultados con SVR y kernel RBF, que realiza una regresión transformando las variables usando el kernel antes y también aplica regularización. 
-Estos dos aspectos le dan la capacidad para predecir datos sobre los que sea bueno utilizar kernels y que necesiten de regularizació para evitar el sobreajuste, como podía ser este caso.
+Estos dos aspectos le dan la capacidad para predecir datos sobre los que sea bueno utilizar kernels y que necesiten de regularización para evitar el sobreajuste, como podía ser este caso.
 Tanto el kernel como la variable C que determina el grado de regularización (a mayor valor de C menor regularización) se optimizaron con cross validation. 
 Los otros kernels utilizados fueron linear, polinómico con 2,3,4 y 5 grados y sigmoide, y también  se obtuvieron resultados buenos utilizando el kernel linear.
 <br><br>
@@ -195,7 +195,7 @@ por lo que se pierde el concepto de observaciones cercanas y lejanas.
 <br><br>
 Vemos también que utilizando algoritmos lineales como regresión Ridge, Lasso, Linear o Elastic Net se consigue un *SMAPE* de 0.29, 
 lo cual no está tan mal en comparación con algoritmos no lineales. Esto se podría intuir viendo que con la transformación logarítimica,
-en los plots del Valor de mercado  frente a cada variable ya hay algunos casos en que hay cierta relación linear. 
+en los plots del <b>Valor de mercado </b>  frente a cada variable ya hay algunos casos en que hay cierta relación linear. 
 También vemos que redondeando al tercer decimal se consiguen las mismas métricas con los 4 modelos.
 <br><br>
 A continuación se muestran los gráficos de valor real vs predicción para el modelo que obtuvo los mejores resultados,
@@ -210,46 +210,46 @@ Vemos que con este modelo como comentamos se ajusta mucho al train set y las pre
 <img height="500" src="reports/plots/test/regression/Value_gradient_boosting.jpg"  width="500"/>
 
 En el validation set empeora un poco pero sigue siendo relativamente bueno incluso para valores altos que están cerca de la recta.
-En este gráfico no se ve bien que pasa para los valores más bajos de Valor de Mercado ya que hay más concentración en esa zona del eje x.
+En este gráfico no se ve bien que pasa para los valores más bajos de <b>Valor de mercado </b> ya que hay más concentración en esa zona del eje x.
 Se ve mejor en los siguiente gráficos.
 <br><br>
-<h5> Gráfico de dispersión con los datos de validación para Valor de mercado infererior a 300000 euros </h5>
+<h5> Gráfico de dispersión con los datos de validación para <b>Valor de mercado </b> infererior a 300000 euros </h5>
 <img height="400" src="reports/plots/test/regresion_sin_valores_altos/Value_gradient_boosting.jpg"  width="500"/>
 
 En este gráfico se ve que las predicciones son bastante buenas ya que la mayor concentración parece que está en torno a la diagonal 
 aunque hay bastante variabilidad para cada valor de x y no se ve bien porque hay demasiados puntos. Podemos verlo mejor 
 mostrando las densidades con un histograma 2d como veremos en el siguiente gráfico.
 <br><br>
-<h5> Histograma 2d con los datos de validación para Valor de mercado infererior a 300000 euros </h5>
+<h5> Histograma 2d con los datos de validación para <b>Valor de mercado </b> infererior a 300000 euros </h5>
 <img height="400" src="reports/plots/test/regresion_histogramas_2d/Value_gradient_boosting.jpg"  width="500"/>
 
 En este último gráfico (con datos solo del conjunto de validación) se aprecia que las predicciones son bastantes buenas viendo que la densidad mayor está en torno 
 a la diagonal a lo largo de todo el eje x.
-<h4> Salario </h4>
+<h4> <b>Salario</b> </h4>
 
-| modelo            |*SMAPE* en train set|*SMAPE* en validation set|MAPE en train set|MAPE en validation set| Parámetros modificados                              |
-|-------------------|------------------|-----------------------|-----------------|----------------------|-----------------------------------------------------|
-| SVR               |0.351             |0.392                  |0.376            |0.432                 | kernel=rbf, ganma=scale, C=1.0, epsilon=0.06        |
-| regresión ridge   |0.45              |0.44                   |0.516            |0.512                 ||
-| regresión lasso   |0.45              |0.44                   |0.516            |0.511                 |                                                     |
-| elastic_net       |0.45              |0.44                   |0.516            |0.511                 | l1_ratio=0.95                                       |
-| random_forest     |0.318             |0.394                  |0.335            |0.451                 | n_estimators=100, min_samples_split=2, max_depth=10 |
-| gradient_boosting |0.119             |0.4                    |0.119            |0.464                 | learning_rate=0.05, max_depth=10, n_estimators=140  |
-| k_neighbors       |0.429             |0.433                  |0.468            |0.485                 | weights=distance, n_neighbors=20, metric=minkowski       |
-| linear SVR        |0.447             |0.44                   |0.498            |0.497                 | C=1.0                                               |
-| regresión linear   |0.45              |0.44                   |0.516            |0.512                 ||
+| modelo            |*SMAPE* en train set|*SMAPE* en validation set| *MAPE* en train set | *MAPE* en validation set | Parámetros modificados                              |
+|-------------------|------------------|-----------------------|---------------------|--------------------------|-----------------------------------------------------|
+| SVR               |0.351             |0.392                  | 0.376               | 0.432                    | kernel=rbf, ganma=scale, C=1.0, epsilon=0.06        |
+| regresión ridge   |0.45              |0.44                   | 0.516               | 0.512                    ||
+| regresión lasso   |0.45              |0.44                   | 0.516               | 0.511                    |                                                     |
+| elastic_net       |0.45              |0.44                   | 0.516               | 0.511                    | l1_ratio=0.95                                       |
+| random_forest     |0.318             |0.394                  | 0.335               | 0.451                    | n_estimators=100, min_samples_split=2, max_depth=10 |
+| gradient_boosting |0.119             |0.4                    | 0.119               | 0.464                    | learning_rate=0.05, max_depth=10, n_estimators=140  |
+| k_neighbors       |0.429             |0.433                  | 0.468               | 0.485                    | weights=distance, n_neighbors=20, metric=minkowski       |
+| linear SVR        |0.447             |0.44                   | 0.498               | 0.497                    | C=1.0                                               |
+| regresión linear   |0.45              |0.44                   | 0.516               | 0.512                    ||
 
-Muchas de las conclusiones son similares a las de los modelos para la variable Valor de mercado. 
+Muchas de las conclusiones son similares a las de los modelos para la variable <b>Valor de mercado </b>. 
 <br><br>
 En cuanto a los resultados, en este caso se consiguen métricas bastante peores.
-Viendo los resultados que aparecen en la tabla, eliminando los 4873 que tienen salario exacto de 1000, el mejor *SMAPE* es con SVR (con kernel RBF) y es de  0.392.
+Viendo los resultados que aparecen en la tabla, eliminando los 4873 que tienen <b>Salario</b> exacto de 1000, el mejor *SMAPE* es con SVR (con kernel RBF) y es de  0.392.
 Es muy similar al obtenido con Gradient Boosting y Random Forest. De los modelos utilizados estos tres son los más potentes y que se pueden aplicar  a más problemas.
 <br><br>
 Usando todos los datos se consiguen malos resultados, los mejores usando SVR con kernel RBF y haciendo la tranformación de antes, se consigue un *SMAPE* de 0.45.
 <br><br>
 Si se divide el dataset por sueldos se pueden mejorar significativamente los resultados.
 Por ejemplo, cogiendo los jugadores con sueldos superiores o iguales a 25000 euros (1619 jugadores) se consigue un *SMAPE* de 0.28, con jugadores de entre 5000 y 25000 (5506 jugadores )se consigue un *SMAPE* de 0.30 y
-con jugadores de sueldos inferiores o iguales a 5000 euros (11889 jugadores)el *SMAPE* es de 0.36. Para estos últimos si además se eliminan los jugadores con salario de 1000 euros, quedando 6787, el *SMAPE* pasa a ser 0.25, y se puede conseguir incluso con un modelo lineal como lasso. 
+con jugadores de sueldos inferiores o iguales a 5000 euros (11889 jugadores)el *SMAPE* es de 0.36. Para estos últimos si además se eliminan los jugadores con <b>Salario</b> de 1000 euros, quedando 6787, el *SMAPE* pasa a ser 0.25, y se puede conseguir incluso con un modelo lineal como lasso. 
 Esto no se podrá aplicar en la práctica porque puedes no saber en qué rango de sueldo está el jugador, habría que 
 encontrar una variable que lo indique y ya se podría incluir en el modelo.
 <br><br>
@@ -257,7 +257,7 @@ A continuación se muestran los gráficos de valor real vs predicción  para el 
 <h5> Gráfico de dispersión con el dataframe completo </h5>
 <img height="500" src="reports/plots/all/regression/Wage_SVR.jpg"  width="500"/>
 
-En este caso las predicciones son bastantes peores que para el valor de mercado, y con el mejor modelo en validación (SVR) lo son incluso en el train set.
+En este caso las predicciones son bastantes peores que para el <b>Valor de mercado </b>, y con el mejor modelo en validación (SVR) lo son incluso en el train set.
 Hay que tener en cuenta que este modelo predice de forma similar en train set (*SMAPE* 0.35) y en validation set (*SMAPE* 0.39).
 Aún así, no se ve bien porque muchos puntos están acumulados en valores pequeños del eje x, hay que ver la densidad.
 <br><br>
@@ -265,27 +265,27 @@ Aún así, no se ve bien porque muchos puntos están acumulados en valores peque
 <img height="500" src="reports/plots/test/regression/Wage_SVR.jpg"  width="500"/>
 
 En el validation set tiene un comportamiento similar a train set, pero hay que ver el histograma 2d con las densidades para los valores más 
-bajos de salario.
-Por otra parte se ve que para valores alto de Salario las predicciones son malas.
+bajos de <b>Salario</b>.
+Por otra parte se ve que para valores alto de <b>Salario</b> las predicciones son malas.
 Aún así, no se ve bien porque muchos puntos están acumulados en valores pequeños del eje x, hay que ver la densidad.
 <br><br>
-<h5> Histograma 2d con los datos de validación para Valor de mercado infererior a 300000 euros </h5>
+<h5> Histograma 2d con los datos de validación para <b>Valor de mercado </b> infererior a 300000 euros </h5>
 <img height="400" src="reports/plots/test/regresion_histogramas_2d/Wage_SVR.jpg"  width="500"/>
 
 En este último gráfico se aprecia que las predicciones en general son malas excepto para los jugadores de sueldo inferior a 5000 o como mucho hasta 7500. 
-  (hay 6787 con sueldo inferior a 5000 de los 13334 que había al quitar los de salario 1000 a los totales). Esto explica por qué el *SMAPE* es de 0.39.
-Como explicamos antes, se mejoran bastante las predicciones agrupando los jugadores en grupos por salario y entrenando y prediciendo en cada grupo por separado.
+  (hay 6787 con sueldo inferior a 5000 de los 13334 que había al quitar los de <b>Salario</b> 1000 a los totales). Esto explica por qué el *SMAPE* es de 0.39.
+Como explicamos antes, se mejoran bastante las predicciones agrupando los jugadores en grupos por <b>Salario</b> y entrenando y prediciendo en cada grupo por separado.
 
 <h3>Clasificación </h3>
 Igual que para regresión, se muestran las métricas obtenidas para predecir cada variable (la posición con diferentes agrupamientos).
 <br>Como comentamos antes, se utilizaron todas las variables explicativas que se indican en la sección <b> Variables a predecir y explicativas </b>,
 y además se incluyo una variable binaria adicional para predecir la posición cuando no se agrupó eliminando el lado. Esta variable es el pie bueno de jugador, que ayuda a diferenciar
-el lado e hizo que mejorase la *accuracy* (pasó de ser 0.51 a 0.61 en el mejor modelo), y se utilizó porque se observó en la matriz de confusión que se cometían muchos errores 
+el lado e hizo que mejorase la **Accuracy** (pasó de ser 0.51 a 0.61 en el mejor modelo), y se utilizó porque se observó en la matriz de confusión que se cometían muchos errores 
 acertando la posición pero fallando en el lado.
 
 <h4>Posición sin agrupamiento </h4>
 
-| modelo              |accuracy en train set|accuracy en validation set| Parámetros modificados                                |
+| modelo              |*Accuracy* en train set|*Accuracy* en validation set| Parámetros modificados                                |
 |---------------------|---------------------|--------------------------|-------------------------------------------------------|
 | random_forest       |0.815                |0.57                      | max_depth=None, min_samples_split=14, n_estimators=100 |                
 | gradient_boosting   |0.98                 |0.55                      | learning_rate=0.1, max_depth=5, n_estimators=100      |
@@ -298,7 +298,7 @@ acertando la posición pero fallando en el lado.
 
 <h4>Posición eliminado en lado </h4>
 
-| modelo            |accuracy en train set|accuracy en validation set| Parámetros modificados                         |
+| modelo            |*Accuracy* en train set|*Accuracy* en validation set| Parámetros modificados                         |
 |-------------------|---------------------|--------------------------|------------------------------------------------|
 | k_neighbors       |0.721                |0.705                     | n_neighbors=30, weights=uniform, metric=minkowski |
 | random_forest     |0.999                |0.722                     | max_depth=20,min_samples_split=2, n_estimators=100 |
@@ -311,7 +311,7 @@ acertando la posición pero fallando en el lado.
 
 <h4>Posición agrupada en Portero, Medio, Defensa y Delantero </h4>
 
-| modelo              |accuracy en train set|accuracy en validation set| Parámetros modificados                           |
+| modelo              |*Accuracy* en train set|*Accuracy* en validation set| Parámetros modificados                           |
 |---------------------|---------------------|--------------------------|--------------------------------------------------|
 | random_forest       |0.859                |0.859                     | max_depth=None,min_samples_split=18, n_estimators=50 |
 | gradient_boosting   |0.86                 |0.86                      | learning_rate=0.1, max_depth=5, n_estimators=100 |
@@ -322,8 +322,8 @@ acertando la posición pero fallando en el lado.
 | lda                 |0.853                |0.853                     | shrinkage=0.1, solver=lsqr                       |
 | SVC  |0.871                |0.871                     | kernel=rbf,  C=2.1,   ganma=scale                |
 
-En el caso de la clasificación, vemos la diferencia de accuracy en los tres niveles de agrupación. <br><br>
-Para la posición original la mejor *accuracy* es de 0.61, para la posición eliminado el lado es de 0.752 y para la agrupación en 
+En el caso de la clasificación, vemos la diferencia de *Accuracy* en los tres niveles de agrupación. <br><br>
+Para la posición original la mejor **Accuracy** es de 0.61, para la posición eliminado el lado es de 0.752 y para la agrupación en 
 4 posiciones es de 0.871.  <br><br>
 En los tres casos el mejor modelo es el SVC, en dos casos con kernel linear y para las posiciones agrupadas con kernel rbf, pero realmente para este caso se obtuvieron resultados
 muy similares con kernel linear.
@@ -359,35 +359,35 @@ mejor modelo para cada variable, utilizando solo los datos de validación.
 <img height="700" src="reports/plots/test/classification/Position_SVC.jpg"  width="700"/>
 
 A pesar de tener 27 clases se ve que las predicciones son bastante buenas, ya que en muchas posiciones los valores de la diagonal
-cubren bastante parte de  la frecuencia marginal, tanto mirando las filas como las columnas (recordemos que la *accuracy* era de 0.61). 
+cubren bastante parte de  la frecuencia marginal, tanto mirando las filas como las columnas (recordemos que la **Accuracy** era de 0.61). 
 <br><br>Además, hay algunos fallos que se deben precisamente a no haber eliminado el lado como las confusiones de central derecho (RCB) e izquierdo (LCB)
 con central (CB) (todos se predicen como central) lo cual es lógico porque tienen las mismas características.
 <br>Otras confusiones son entre medio izquierdo (LM) y medio derecho (DM) entre ambas pero no con medio centro (MC), o las de medio centro derecho
 (RCM) y medio centro izquierdo  (LCM ) que se predicen como medio centro (MC). Por este motivo a la hora de agrupar se juntaron LCM Y RCM con CM, y por otro lado 
 LM y DM.
 <br><br>
-En cuanto a las que se predicen bien, portero (GK) se predice perfecto, tendría *recall* ( TP/(TP+FN))  y *precission* (TP/(TP+FP)) del 100%. 
+En cuanto a las que se predicen bien, portero (GK) se predice perfecto, tendría **Recall** ( TP/(TP+FN))  y **Precission** (TP/(TP+FP)) del 100%. 
 <br>Lateral derecho (RB)
 e izquierdo (LB) también se predicen bien. Posteriormente se agruparon con central para no tener posiciones donde se incluyese el lado, 
 pero serían las únicas que se podrían mantener separadas.
-<br>Hay posiciones que tienen recall muy alta y *precission* no tan alta como central (CB), medio centro (MC) o delantero centro (ST).
+<br>Hay posiciones que tienen *Recall* muy alta y **Precission** no tan alta como central (CB), medio centro (MC) o delantero centro (ST).
 <br><br>
 <h5> Variable: Posición eliminando el lado. Usando modelo SVC con kernel lineal </h5>
 <img height="500" src="reports/plots/test/classification/PositionSinLado_SVC.jpg" width="500"/>
 
-Como ya vimos viendo la *accuracy* al eliminar los lados las predicciones mejoran bastante (*accuracy* del 75%).
+Como ya vimos viendo la **Accuracy** al eliminar los lados las predicciones mejoran bastante (**Accuracy** del 75%).
 <br><br>Vemos que al agrupar centrales y laterales en cetral (los únicos defensas que quedan fuera son los carrileros) hay muchos jugadores en
 la posición CB y esto podría hacer que muchos jugadores se predijesen como central, por lo que hay que fijarse mucho
-en la *precission* para esta clase y el *recall* para las otras, ya que cuando hay una clase 
-dominante se puede llegar a obtener buena *accuracy* prediciendo mucho esa clase.<br><br> Sin ambargo en este caso vemos que la precisión de CB es alta, 
+en la **Precission** para esta clase y el **Recall** para las otras, ya que cuando hay una clase 
+dominante se puede llegar a obtener buena **Accuracy** prediciendo mucho esa clase.<br><br> Sin ambargo en este caso vemos que la precisión de CB es alta, 
 no hay muchos casos en los que se prediga CB siendo otra clase.
-Al margen de esto, vemos que la mayor parte de los datos están en la diagonal, lo que suponíamos por la *accuracy*.
+Al margen de esto, vemos que la mayor parte de los datos están en la diagonal, lo que suponíamos por la **Accuracy**.
 
 
-<h5> Histograma 2d con los datos de validación para Valor de mercado infererior a 300000 euros </h5>
+<h5> Histograma 2d con los datos de validación para <b>Valor de mercado </b> infererior a 300000 euros </h5>
 <img height="400" src="reports/plots/test/classification/PositionGrouped_SVC.jpg"  width="500"/>
 
-Al agrupar en las 4 posiciones las predicciones mejorán notablemente, consiguiendo una *accuracy* del 87%. Vemos que casi todos los datos están en la diagonal,
+Al agrupar en las 4 posiciones las predicciones mejorán notablemente, consiguiendo una **Accuracy** del 87%. Vemos que casi todos los datos están en la diagonal,
  no hay confusiones entre delantero y defensa y los fallos más numerosos son los de delanteros que se predicen como medios.
 
 
