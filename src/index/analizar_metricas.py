@@ -8,11 +8,11 @@ warnings.filterwarnings('ignore')
 from utils import load_config
 
 pd.set_option('display.max_rows', 1000)
-buscar_mejores_parametros=False
-plotear_variacion_con_marametros=False
+buscar_mejores_parametros=True
+
 
 if __name__ == "__main__":
-    feature = "PositionGrouped"
+    feature = "Value"
     todos_los_modelos = True
     modelo = "SVR"
     metrica = "SMAPE"
