@@ -394,7 +394,7 @@ Al agrupar en las 4 posiciones las predicciones mejorán notablemente, consiguie
 ## CLUSTERING
 Se utilizó clustering para agrupar a los jugadores. Puesto que con las dos primeras  componentes principales se explicaba el 75% de la varianza y 
 con las tres primeras el 80%, se utilizó inicialmente PCA para trabajar con menos dimensiones y visualizar los resultados.
-Utilizando 2 componentes son las siguientes:
+Utilizando 3 componentes son las siguientes:
 
 Cracterística               |comp_0|comp_1|comp_2|
 |-----------------------|------|------|------|
@@ -454,7 +454,7 @@ Además de esto tiene altos atributos propios de Medio como Vision, LongPassing 
 un poco medios de delanteros.
 <h5>Tercera componente</h5>
 <img height="600" src="reports/pca/pca_3comps_comp_2.png" width="800"/>
-Utilizando 3 componentes son las siguientes:
+
 
 <br><br>
 Ahora veremos los grupos generados con kmeans fijando k=4, con 2 y tres componentes, después veremos el k que seleccionamos con el método del codo.
@@ -471,10 +471,11 @@ y la segunda componente separa defensas de delanteros).
 <img height="600" src="reports/plots/clustering/clusters_k_4_3comps_.jpg" width="800"/>
 <h5>Posiciones de k_means con 3 componentes</h5>
 <img height="600" src="reports/plots/clustering/PositionGrouped_3comps_.jpg" width="800"/>
-Vemos que con tres dimensiones las posiciones no se separan (los medios se solapan especialmente con los delanteros), pero muchos de los medios 
-si están en el cluster que quedaría asignado a medios.
+Vemos que con tres dimensiones las posiciones no se separan (los medios se solapan especialmente con los delanteros), los medios 
+ están distribuidos entre  el cluster que quedaría asignado a medios y el de los delanteros.
 <br><br>
 Lo vemos de manera más clara con la matriz de confusión, donde vemos que muchos medios corresponden al cluster que le asignamos a los delanteros.
+Los delanteros están prácticamente todos en su clúster, y en cuanto a los defensas hay aproximadamente dos tercios en su clúster y 1/3 en el de medios.
 <img height="600" src="reports/plots/clustering/_heat_map.jpg" width="800"/>
 <br><br><br>
 
