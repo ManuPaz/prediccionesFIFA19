@@ -1,6 +1,6 @@
 # Machine learning sobre datos del FIFA 19
 
-Comparación de  diferentes modelos de regresión y clasificación para predecir diferentes variables de los jugadores del FIFA 19.
+Comparación de  diferentes modelos de regresión y clasificación para predecir diferentes variables de los jugadores del FIFA 19, y clustring para agruparlos.
 ## VARIABLES A PREDECIR Y VARIABLES EXPLICATIVAS
 Las variables que se quieren predecir son las siguientes:
 * **<b>Valor de mercado </b> del jugador (regresión).**
@@ -72,7 +72,7 @@ Las variables explicativas disponibles son las características de los jugadores
 * Marking
 * Balance
 * Curve
-* Acceleratio
+* Acceleration
 * Crossing
 * Stamina
 * Agility
@@ -92,6 +92,7 @@ se muestran las predicciones (con el mejor modelo o todos) y el valor real.
 * **plots_results**. Para visualizar las predicciones: predicción vs valor real usando gráficos de dispersión o histogramas 2d.
 * **plots_explicativas**  Para visualizar los valores de <b><b>Salario</b></b> y <b><b>Valor de mercado </b></b> frente a las explicativas. De estas visualizaciones podemos pensar que
 quizás sea útil utilizar una transformación logarítimica sobre ambas variables para predecirlas.
+* **clustering**. Kmeans y dbscan para agrupar a los jugadores.
 
 En <b>reports/</b> están almacenados diferentes reportes:
 * **resultados_entrenamiento_cv/**. Se guardan  los resultados de cross validation para todos los modelos en un archivo *json* para cada variable(incluyendo métricas, parámetros opimizados, parámetros fijos que se hayan modificado respecto al valor por defecto,
@@ -117,7 +118,7 @@ modelos a utilizar, variables a predecir etc).
 Los modelos  se encapsulan en un objeto definido en <b>src/functions/machine_learning</b> que permite calcular las métricas, optimizar parámetros,
 ,guarda en sus atributos los últimos conjuntos de  train con los que entrenó y de  test que predijo. Se guardan con pickle yse utilizan estos objetos para predecir.
 
-## PROCESO DE SELECCIÓN DE MODELOS Y RESULTADOS
+## PROCESO DE SELECCIÓN DE MODELOS Y RESULTADOS EN REGRESIÓN Y CLASIFICACIÓN
 
 Ahora se comentan el proceso seguido para el entrenamiento y selección de modelos finales, y los resultados obtenidos.
 <br><br>
@@ -366,11 +367,11 @@ con central (CB) (todos se predicen como central) lo cual es lógico porque tien
 (RCM) y medio centro izquierdo  (LCM ) que se predicen como medio centro (MC). Por este motivo a la hora de agrupar se juntaron LCM Y RCM con CM, y por otro lado 
 LM y DM.
 <br><br>
-En cuanto a las que se predicen bien, portero (GK) se predice perfecto, tendría *Recall* ( TP/(TP+FN))  y *Precission (TP/(TP+FP)) del 100%. 
+En cuanto a las que se predicen bien, portero (GK) se predice perfecto, tendría *Recall* ( TP/(TP+FN))  y *Precission* (TP/(TP+FP)) del 100%. 
 <br>Lateral derecho (RB)
 e izquierdo (LB) también se predicen bien. Posteriormente se agruparon con central para no tener posiciones donde se incluyese el lado, 
 pero serían las únicas que se podrían mantener separadas.
-<br>Hay posiciones que tienen *Recall* muy alta y *Precission no tan alta como central (CB), medio centro (MC) o delantero centro (ST).
+<br>Hay posiciones que tienen *Recall* muy alta y *Precission* no tan alta como central (CB), medio centro (MC) o delantero centro (ST).
 <br><br>
 <h5> Variable: Posición eliminando el lado. Usando modelo SVC con kernel lineal </h5>
 <img height="500" src="reports/plots/test/classification/PositionSinLado_SVC.jpg" width="500"/>
@@ -378,7 +379,7 @@ pero serían las únicas que se podrían mantener separadas.
 Como ya vimos viendo la *Accuracy* al eliminar los lados las predicciones mejoran bastante (*Accuracy* del 75%).
 <br><br>Vemos que al agrupar centrales y laterales en cetral (los únicos defensas que quedan fuera son los carrileros) hay muchos jugadores en
 la posición CB y esto podría hacer que muchos jugadores se predijesen como central, por lo que hay que fijarse mucho
-en la *Precission para esta clase y el *Recall* para las otras, ya que cuando hay una clase 
+en la *Precission* para esta clase y el *Recall* para las otras, ya que cuando hay una clase 
 dominante se puede llegar a obtener buena *Accuracy* prediciendo mucho esa clase.<br><br> Sin ambargo en este caso vemos que la precisión de CB es alta, 
 no hay muchos casos en los que se prediga CB siendo otra clase.
 Al margen de esto, vemos que la mayor parte de los datos están en la diagonal, lo que suponíamos por la *Accuracy*.
@@ -388,6 +389,97 @@ Al margen de esto, vemos que la mayor parte de los datos están en la diagonal, 
 <img height="400" src="reports/plots/test/classification/PositionGrouped_SVC.jpg"  width="500"/>
 
 Al agrupar en las 4 posiciones las predicciones mejorán notablemente, consiguiendo una *Accuracy* del 87%. Vemos que casi todos los datos están en la diagonal,
- no hay confusiones entre delantero y defensa y los fallos más numerosos son los de delanteros que se predicen como medios.
+ no hay confusiones entre delantero y defensa y los fallos más numerosos son los de delanteros que se predicen como medios.BR
+<br>
+## CLUSTERING
+Se utilizó clustering para agrupar a los jugadores. Puesto que con las dos primeras  componentes principales se explicaba el 75% de la varianza y 
+con las tres primeras el 80%, se utilizó inicialmente PCA para trabajar con menos dimensiones y visualizar los resultados.
+Utilizando 2 componentes son las siguientes:
 
+Cracterística               |comp_0|comp_1|comp_2|
+|-----------------------|------|------|------|
+|Reactions              |-0.048|0.001 |0.245 |
+|Overall                |-0.036|0.0   |0.2   |
+|BallControl            |-0.214|-0.051|0.038 |
+|Penalties              |-0.163|-0.146|0.018 |
+|GKPositioning          |0.199 |-0.051|0.314 |
+|SlidingTackle          |-0.149|0.411 |0.083 |
+|StandingTackle         |-0.161|0.412 |0.099 |
+|ShortPassing           |-0.181|0.012 |0.117 |
+|Jumping                |-0.041|0.057 |0.01  |
+|Interceptions          |-0.151|0.381 |0.17  |
+|Finishing              |-0.2  |-0.258|0.006 |
+|GKKicking              |0.193 |-0.051|0.301 |
+|HeadingAccuracy        |-0.172|0.119 |-0.131|
+|Aggression             |-0.154|0.213 |0.101 |
+|LongPassing            |-0.168|0.049 |0.223 |
+|GKHandling             |0.199 |-0.052|0.309 |
+|Volleys                |-0.188|-0.191|0.079 |
+|Vision                 |-0.13 |-0.116|0.263 |
+|LongShots              |-0.217|-0.174|0.153 |
+|GKReflexes             |0.211 |-0.055|0.328 |
+|GKDiving               |0.208 |-0.054|0.322 |
+|Positioning            |-0.226|-0.181|0.019 |
+|SkillMoves             |-0.008|-0.005|0.002 |
+|Dribbling              |-0.234|-0.119|0.005 |
+|FKAccuracy             |-0.185|-0.1  |0.222 |
+|Marking                |-0.154|0.349 |0.077 |
+|Balance                |-0.117|-0.091|-0.06 |
+|Curve                  |-0.208|-0.128|0.185 |
+|Acceleration           |-0.14 |-0.099|-0.135|
+|Crossing               |-0.215|-0.045|0.13  |
+|Stamina                |-0.174|0.068 |-0.007|
+|Agility                |-0.139|-0.122|-0.013|
+|ShotPower              |-0.196|-0.105|0.103 |
+|SprintSpeed            |-0.136|-0.084|-0.144|
+|Strength               |-0.023|0.119 |0.082 |
+<br>
+Si nos fijamos en las características vemos que la primera tiene muy altas las características de portero  
+(GKKicking, GKHandling, GKPositioning yGKReflexes)
+y negativas el resto, por lo que  diferencia a los porteros.
+<br>
+<h5>Primera componente</h5>
+<img height="600" src="reports/pca/pca_3comps_comp_0.png" width="800"/>
+<br><br>
+Los jugadores que tendrán la segunda componente positiva son buenos defensores y malos finalizadores principalmente.<br>
+Buenos defensores por:Marking,StandingTackle,SlidingTackle,Interceptions,Aggression. <br>
+Malos finalizadores por: Finishing,Volleys, Penalties y LongShots.<br>
+Diferencia principlamente delanteros de defensas.
+<h5>Segunda componente</h5>
+<img height="600" src="reports/pca/pca_3comps_comp_1.png" width="800"/>
+<br><br>
+La tercera es más difícil de explicar, tiene los componentes de portero altos pero esto ya se usa en la primera 
+para diferenciar porteros.<br>
+Además de esto tiene altos atributos propios de Medio como Vision, LongPassing y bajos los de finalización, por lo que diferenciará
+un poco medios de delanteros.
+<h5>Tercera componente</h5>
+<img height="600" src="reports/pca/pca_3comps_comp_2.png" width="800"/>
+Utilizando 3 componentes son las siguientes:
 
+<br><br>
+Ahora veremos los grupos generados con kmeans fijando k=4, con 2 y tres componentes, después veremos el k que seleccionamos con el método del codo.
+<h5>Clusters de k_means con 2 componentes</h5>
+<img height="600" src="reports/plots/clustering/clusters_k_4_2comps_.jpg" width="800"/>
+<h5>Posiciones de k_means con 2 componentes</h5>
+<img height="600" src="reports/plots/clustering/PositionGrouped_2comps_.jpg" width="800"/>
+En dos dimensiones vemos ya como coinciden los clusters con las posiciones excepto para medio que no tiene un grado de coincidencia tan 
+alto ya que se solapa con delantero y defensa.
+Vemos también como las posiciones se ajustan a los componentes principales como pensábamos (el portero se separa con la primera componente 
+y la segunda componente separa defensas de delanteros).
+<br><br>
+<h5>Clusters de k_means con 3 componentes</h5>
+<img height="600" src="reports/plots/clustering/clusters_k_4_3comps_.jpg" width="800"/>
+<h5>Posiciones de k_means con 3 componentes</h5>
+<img height="600" src="reports/plots/clustering/PositionGrouped_3comps_.jpg" width="800"/>
+Vemos que con tres dimensiones las posiciones no se separan (los medios se solapan especialmente con los delanteros), pero muchos de los medios 
+si están en el cluster que quedaría asignado a medios.
+<br><br>
+Lo vemos de manera más clara con la matriz de confusión, donde vemos que muchos medios corresponden al cluster que le asignamos a los delanteros.
+<img height="600" src="reports/plots/clustering/_heat_map.jpg" width="800"/>
+<br><br><br>
+
+Para determinar el valor de k se utiliza el método del codo, que consiste en para que valor de k se reduce la pendiente de la inercia en función de k. 
+La inercia es la media de las diferencias al cuadrado de los puntos al cluster al que son asignados.
+Vemos ahora el método del codo para la selección de k con tres componentes:
+
+<img height="400" src="reports/plots/clustering/elbow_method_3comps_.jpg" width="400"/>

@@ -40,7 +40,7 @@ variables_predictoras:
            "SprintSpeed" ,"Strength","PreferredFoot"
         ]
 
-  todas: [ "InternationalReputation", "Reactions", "Overall",
+  todas: [  "Reactions", "Overall",
            "BallControl", "Penalties", "GKPositioning",
            "SlidingTackle", "StandingTackle",
            "ShortPassing", "Jumping", "Interceptions",
@@ -51,7 +51,7 @@ variables_predictoras:
            "SkillMoves" ,"Dribbling" ,"FKAccuracy",
            "Marking" ,"Balance" ,"Curve" ,"Acceleration",
            "Crossing", "Stamina", "Agility" ,"ShotPower",
-           "SprintSpeed" ,"Strength","PreferredFoot"
+           "SprintSpeed" ,"Strength"
   ]
   Value: [ "InternationalReputation", "Reactions", "Overall",
            "BallControl", "Penalties", "GKPositioning",
@@ -79,6 +79,7 @@ nombre_dir_reportes_finales: "reports/resultados_finales/"
 nombre_dir_reportes_plots_all: "reports/plots/all/"
 nombre_dir_reportes_plots_test: "reports/plots/test/"
 nombre_dir_reportes_plots_clustering: "reports/plots/clustering/"
+nombre_dir_reportes_tablas: "reports/pca/"
 nombre_dir_tablas: "reports/resultados_csv/"
 entrenamiento:
 

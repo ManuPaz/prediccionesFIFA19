@@ -3,6 +3,9 @@ import pandas as pd
 from sklearn.cluster import KMeans
 import numpy as np
 import seaborn as sns
+from scipy.spatial import distance
+import matplotlib.pyplot as plt
+
 def elbow_method(k_minimo: int,k_maximo:int,costes:list, nombre_archivo:str=None):
     """
     Dibuja el plot del para seleccionar k usando el método del codo
@@ -16,16 +19,39 @@ def elbow_method(k_minimo: int,k_maximo:int,costes:list, nombre_archivo:str=None
     ax=fig.add_subplot(111, projection='rectilinear')
     ax.set_xticks(np.arange(len(costes)), labels=range(k_minimo,k_maximo+1))
     plt.plot(range(k_minimo, k_maximo + 1), costes, '--', color="green")
-    plt.title("Diminución do custo")
+    plt.title("Disminución  del coste")
     plt.xlabel("k")
     plt.ylabel("custo")
     plt.show()
     if nombre_archivo is not None:
         fig.savefig(nombre_archivo)
 
+def optimizar_k(k_min: int, k_max:int, df_transformed:pd.DataFrame, n_init:int, max_iter:int):
+    """
+    Entrena kmeans con multiples k y devuelve los costes y centroides.
+
+    :param k_min: minimo k para kmeans
+    :param k_max: maximo k para kmeans
+    :param df_transformed: dataframe
+    :param n_init: numero de inicios en k_mean
+    :param max_iter: maximo numero de iteraciones en kmeans
+    :return: lista de costes para cada k y lista de centroides para cada k
+    :rtype list and list
+    """
+    costes_finales = []
+    centroides_finales = []
+    for k in range(k_min, k_max + 1):
+        print(k)
+        model, coste, centroides = train_k_means(k, df_transformed, inicio="random", n_init=n_init,
+                                                                      max_iter=max_iter)
+        costes_finales.append(coste)
+        centroides_finales.append(centroides)
+
+    return costes_finales,centroides_finales
 
 def train_k_means(num_clusters:int,df:pd.DataFrame, inicio:str="random", n_init:int=100, max_iter=100 ):
     """
+    Entrena kmeans para un k y unos parametros concretos.
 
     :param num_clusters: numero de clusters=k
     :param df:  dataframe
@@ -44,55 +70,37 @@ def train_k_means(num_clusters:int,df:pd.DataFrame, inicio:str="random", n_init:
     return model,coste,centroides
 
 
-def plot_scatter_2d_with_classes(dataframe:pd.DataFrame,centroides:list,nombre_archivo:str=None):
+
+
+
+
+def asignar_centroides_a_clusters(df: pd.DataFrame, centroides: list, uno_a_uno:bool =True):
     """
-    Para hacer scatter plot 2D con colores que sean las categorias y puntos que en este caso son los centroides
+    Asigna cada posicion al cluster donde hay mas muestras de esa posicion
 
-    :param dataframe:
-    :param centroides:  puntos a dibujar
-    :param nombre_archivo: archivo para guardar el plot (opcional)
+    :param uno_a_uno: asignar cada posicion a un cluster o puede haber varias posiciones en un cluster
+    :return:
+    :param df:
+    :param centroides: centroides obteneidos con kmean
+    :return: diccionario con el cluster para cada posicion
+    :rtype: dict
     """
-    fig = plt.figure()
+    df_grouped = df.groupby(["position","cluster"]).count()
+    posiciones_clusters={}
+    for posicion in df_grouped.index.get_level_values(0).unique():
+
+        minimo=df_grouped.loc[posicion].groupby("cluster").max().idxmax().comp1
+        if not uno_a_uno:
+            posiciones_clusters[posicion]=minimo
+        else:
+            df_aux=df_grouped.loc[posicion].groupby("cluster").max()
+            while(minimo in posiciones_clusters.values()):
+
+                df_aux.drop(minimo,inplace=True)
+                minimo =  df_aux.idxmax().comp1
+            posiciones_clusters[posicion] = minimo
+    return posiciones_clusters
 
 
-    # Engadimos os scatterplots
-    cols=dataframe.columns
-    rel=sns.relplot(x = cols[0], y = cols[1], data = dataframe, height=8, hue =cols[2] )
-    ax1=rel.fig.axes[0]
-
-    ax1.scatter(centroides[:, 0], centroides[:, 1], s=200, marker='x', color='black')  # Centroides
-
-    ax1.set_title("Variables %s y %s " % (dataframe.columns[0], dataframe.columns[1]))  # Poñemos un título
-    ax1.set_xlabel("%s" % dataframe.columns[0])  # Nombramos os eixos
-    ax1.set_ylabel("%s" % dataframe.columns[1])
-
-    plt.show()  # Mostramos a figura por pantalla
-    if nombre_archivo is not None:
-        rel.savefig(nombre_archivo)
-
-def plot_scatter_3d_with_classes(dataframe:pd.DataFrame,centroides:list,nombre_archivo:str=None):
-    """
 
 
-    :param dataframe:
-    :param centroides: puntos a dibujar
-    :param nombre_archivo: archivo para guardar el plot (opcional)
-    """
-    fig = plt.figure()
-    threedee = fig.add_subplot(projection='3d')
-    dict_colors={e:i for i,e in enumerate(np.unique(dataframe.iloc[:,3]))}
-    dict_colors_inv = {i: e for i, e in enumerate(np.unique(dataframe.iloc[:, 3]))}
-    dataframe.loc[:,dataframe.columns[3]]=dataframe.iloc[:,3].transform(lambda x:dict_colors[x])
-    ax=threedee.scatter(dataframe.iloc[:, 0], dataframe.iloc[:, 1], dataframe.iloc[:, 2], c=dataframe.iloc[:, 3])
-    legend=ax.legend_elements()
-    for i,e in dict_colors_inv.items():
-        legend [1][i]=e
-
-    threedee.legend(*legend)
-    threedee.scatter(centroides[:, 0], centroides[:, 1],centroides[:, 2], s=200, marker='x', color='black')  # Centroides
-    threedee.set_xlabel(dataframe.columns[0])
-    threedee.set_ylabel(dataframe.columns[1])
-    threedee.set_zlabel(dataframe.columns[2])
-
-    if nombre_archivo is not None:
-       fig.savefig(nombre_archivo)
