@@ -484,3 +484,7 @@ La inercia es la media de las diferencias al cuadrado de los puntos al cluster a
 Vemos ahora el método del codo para la selección de k con tres componentes:
 
 <img height="400" src="reports/plots/clustering/elbow_method_3comps_.jpg" width="400"/>
+
+El valor que seleccionaríamos utilizando esté método es k=8, que es donde la función de coste se aplana bastante.
+Mostramos ahora las clusters obtenidos:
+<img height="600" src="reports/plots/clustering/clusters_k_8_3comps_.jpg" width="800"/>

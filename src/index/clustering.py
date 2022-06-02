@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
 
     # k elegido usando el metodo del codo
-    k_elegido = 4
+    k_elegido = 8
 
     #pca
     if dimension_reduction:
@@ -79,7 +79,8 @@ if __name__ == '__main__':
     grupos = model.labels_
     df_transformed["cluster"] = grupos
 
-    position_clusters = functions_clustering.asignar_centroides_a_clusters(df_transformed, centroides)
+    if k_elegido == 4:
+        position_clusters = functions_clustering.asignar_centroides_a_clusters(df_transformed, centroides)
 
     if n_comps==2:
         funcion_clustering= plots.plot_scatter_2d_with_classes
@@ -87,27 +88,22 @@ if __name__ == '__main__':
         funcion_clustering=  plots.plot_scatter_3d_with_classes
 
 
-
-    funcion_clustering(df_transformed, centroides,
-                     nombre_archivo=nombre_archivo1,position_clusters=position_clusters,girar=False)
+    if k_elegido==4:
+        funcion_clustering(df_transformed, centroides,
+                         nombre_archivo=nombre_archivo1,position_clusters=position_clusters,girar=False)
     df_transformed = df_transformed.drop("position", axis=1)
     funcion_clustering(df_transformed, centroides,
                                                       nombre_archivo=nombre_archivo2, position_clusters=None,
                                                       girar=False)
 
+    if k_elegido == 4:
+        #si utilizamos un numero de cluster que corresponde con el numero de posiciones, asignamos clusters a posiciones para ver si coinciden el cluster
+        df_transformed["position"] = position
+        df_transformed["position"] = df_transformed.position.transform(lambda x: position_clusters[x])
+        cm = confusion_matrix(df_transformed.position.values.reshape(-1), df_transformed.cluster.values.reshape(-1),labels=list(position_clusters.values()))
+        cm = pd.DataFrame(cm, columns=list(position_clusters.values()), index=list(position_clusters.keys()))
 
-
-
-
-
-
-    #si utilizamos un numero de cluster que corresponde con el numero de posiciones, asignamos clusters a posiciones para ver si coinciden el cluster
-    df_transformed["position"] = position
-    df_transformed["position"] = df_transformed.position.transform(lambda x: position_clusters[x])
-    cm = confusion_matrix(df_transformed.position.values.reshape(-1), df_transformed.cluster.values.reshape(-1),labels=list(position_clusters.values()))
-    cm = pd.DataFrame(cm, columns=list(position_clusters.values()), index=list(position_clusters.keys()))
-
-    plots.plot_heat_map(cm,nombre_dir_plots, "Posicion vs cluster", "Cluster"," Posicion")
+        plots.plot_heat_map(cm,nombre_dir_plots, "Posicion vs cluster", "Cluster"," Posicion")
 
 
 
