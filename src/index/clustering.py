@@ -94,8 +94,8 @@ def clustering_dbscan(df_trasnformed,  position, nombre_dir_plots ):
         min_index = max(resultados, key=resultados.get)
         print(min_index)
 
-    eps=0.1
-    min_samples=100
+    eps=0.3
+    min_samples=250
     db=functions_clustering.train_dbscan(df_trasnformed,eps=eps,min_samples=min_samples)
     labels=db.labels_
     functions_clustering.metrics_clustering(labels, position)
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     #si se baja la dimension con pca
     dimension_reduction=True
     #numero de componentes si se usa pca
-    n_comps = 2
+    n_comps = 3
 
     #parametros para la asignacion de clusters a posiciones
     uno_a_uno=True
