@@ -79,6 +79,8 @@ nombre_dir_reportes_finales: "reports/resultados_finales/"
 nombre_dir_reportes_plots_all: "reports/plots/all/"
 nombre_dir_reportes_plots_test: "reports/plots/test/"
 nombre_dir_reportes_plots_clustering: "reports/plots/clustering/"
+nombre_dir_reportes_plots_kmeans: "reports/plots/clustering/kmeans/"
+nombre_dir_reportes_plots_dbscan: "reports/plots/clustering/dbscan/"
 nombre_dir_reportes_tablas: "reports/pca/"
 nombre_dir_tablas: "reports/resultados_csv/"
 entrenamiento:

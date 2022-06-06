@@ -457,34 +457,116 @@ un poco medios de delanteros.
 
 
 <br><br>
+
+<h3>KMEANS</h3>
 Ahora veremos los grupos generados con kmeans fijando k=4, con 2 y tres componentes, después veremos el k que seleccionamos con el método del codo.
 <h5>Clusters de k_means con 2 componentes</h5>
-<img height="600" src="reports/plots/clustering/clusters_k_4_2comps_.jpg" width="800"/>
+<img height="600" src="reports/plots/clustering/kmeans/clusters_k_4_2comps_.jpg" width="800"/>
 <h5>Posiciones de k_means con 2 componentes</h5>
-<img height="600" src="reports/plots/clustering/PositionGrouped_2comps_.jpg" width="800"/>
+<img height="600" src="reports/plots/clustering/kmeans/PositionGrouped_2comps_.jpg" width="800"/>
 En dos dimensiones vemos ya como coinciden los clusters con las posiciones excepto para medio que no tiene un grado de coincidencia tan 
 alto ya que se solapa con delantero y defensa.
 Vemos también como las posiciones se ajustan a los componentes principales como pensábamos (el portero se separa con la primera componente 
 y la segunda componente separa defensas de delanteros).
 <br><br>
 <h5>Clusters de k_means con 3 componentes</h5>
-<img height="600" src="reports/plots/clustering/clusters_k_4_3comps_.jpg" width="800"/>
+<img height="600" src="reports/plots/clustering/kmeans/clusters_k_4_3comps_.jpg" width="800"/>
 <h5>Posiciones de k_means con 3 componentes</h5>
-<img height="600" src="reports/plots/clustering/PositionGrouped_3comps_.jpg" width="800"/>
+<img height="600" src="reports/plots/clustering/kmeans/PositionGrouped_3comps_.jpg" width="800"/>
 Vemos que con tres dimensiones las posiciones no se separan (los medios se solapan especialmente con los delanteros), los medios 
  están distribuidos entre  el cluster que quedaría asignado a medios y el de los delanteros.
 <br><br>
 Lo vemos de manera más clara con la matriz de confusión, donde vemos que muchos medios corresponden al cluster que le asignamos a los delanteros.
 Los delanteros están prácticamente todos en su clúster, y en cuanto a los defensas hay aproximadamente dos tercios en su clúster y 1/3 en el de medios.
-<img height="600" src="reports/plots/clustering/_heat_map.jpg" width="800"/>
+<img height="600" src="reports/plots/clustering/kmeans/heatmaps/heat_map_k4_ncomps3.png" width="800"/>
+<br><br>
+Si utilizamos k=14, y lo intentamos relacionar con las posiciones eliminado el lado, que generaban 14 grupos, no se aprecia 
+relación 1 a 1 para casi ninguna posición, como se ve en los siguientes gráficos.
+
+<h5>Matriz de  confusion con 3 componentes</h5>
+<img height="600" src="reports/plots/clustering/kmeans/heatmaps/heat_map_k14_ncomps2.png" width="800"/>
+<h5>Clusters y posiciones para 3 componentes</h5>
+<img height="600" src="reports/plots/clustering/kmeans/clusters_k_14_3comps_.jpg" width="800"/>
+<img height="600" src="reports/plots/clustering/kmeans/PositionSinLado_3comps_.jpg" width="800"/>
+
 <br><br><br>
 
 Para determinar el valor de k se utiliza el método del codo, que consiste en para que valor de k se reduce la pendiente de la inercia en función de k. 
 La inercia es la media de las diferencias al cuadrado de los puntos al cluster al que son asignados.
 Vemos ahora el método del codo para la selección de k con tres componentes:
 
-<img height="400" src="reports/plots/clustering/elbow_method_3comps_.jpg" width="400"/>
+<img height="400" src="reports/plots/clustering/kmeans/optimizacion/elbow_method_3comps_.jpg" width="400"/>
 
 El valor que seleccionaríamos utilizando esté método es k=8, que es donde la función de coste se aplana bastante.
 Mostramos ahora las clusters obtenidos:
-<img height="600" src="reports/plots/clustering/clusters_k_8_3comps_.jpg" width="800"/>
+<img height="600" src="reports/plots/clustering/kmeans/clusters_k_8_3comps_.jpg" width="800"/>
+
+<br><br>
+Ahora mostramos diferentes métricas y como varían en función de k.
+Todas las métricas devuelven de media 0 para etiquetas random y 1 para etiquetas perfectas de acuerdo a las clases.
+* **homogeneity_score**. Mide que los puntos de un cluster sean de la misma clase (tomamos como clase las 4 posiciones agrupadas).
+* **completeness_score**. Mide que los puntos de cada clase estén en el mismo clúster.
+* **V-measure**. Media ponderada de homogeneity_score  y  V-measure.
+* **adjusted_mutual_info_score** Mide la dependencia mutua entre dos clases.
+* **adjusted_Rand_index**. Mide la similitud entre los clusters.
+
+<br><br>
+<img height="400" src="reports/plots/clustering/kmeans/optimizacion/3comps+_metrica_Homogeneity.jpg" width="400"/>
+<img height="400" src="reports/plots/clustering/kmeans/optimizacion/3comps+_metrica_Completeness.jpg" width="400"/>
+<img height="400" src="reports/plots/clustering/kmeans/optimizacion/3comps+_metrica_V-measure.jpg" width="400"/>
+<img height="400" src="reports/plots/clustering/kmeans/optimizacion/3comps+_metrica_Adjusted Rand Index.jpg" width="400"/>
+<img height="400" src="reports/plots/clustering/kmeans/optimizacion/3comps+_metrica_Adjusted Mutual Information.jpg" width="400"/>
+<br><br>
+Viendo estas métricas seleccionaríamos k=5.
+Mostramos ahora las métricas para  k=5, k=8  y para k=4 (el que se corresponde con las 4 posiciones agrupadas):
+
+|             | 4      | 5      | 8     |
+|-------------|--------|--------|-------|
+| Homogeneity | 0.555 | 0.574 | 0.594 |
+| Completeness    |  0.541 |  0.473  | 0.371  |
+| V-measure|0.548  |  0.518| 0.457 |
+| Adjusted Rand Index   |0.400  | 0.364 | 0.269 |
+| Adjusted Mutual Information   |0.548  | 0.518 | 0.457 |
+
+
+
+<br><br>
+<h3>DBSCAN</h3>
+Ahora veremos los grupos obtenidos utilizando DBSCAN. 
+Utilizando DBSCAN tenemos dos parámetros para optimizar: 
+* **esp** . La distancia mímina para considerar dos puntos vecinos. 
+* **min_samples** . El número mínimo de puntos para tener un centro de densidad.
+
+<br><br>
+Primero vemos los resultados utilizando 2 componentes principales. 
+
+<br>Optimizando los dos parámetros usando el V-score obtenemos que el mejor par es esp=0.1 y min_samples=100.
+El número de clusters obtenidos es 4, y el número de observaciones cosidradas ruido es 5419.
+<br>
+Se obtienen estas métricas:
+* **Homogeneity: 0.431**
+* **Completeness: 0.445**
+* **V-measure: 0.438**
+* **Adjusted Rand Index: 0.320**
+* **Adjusted Mutual Information: 0.437**
+
+Ahora vemos los clusters generados con DBSCAN.
+<h5>Clusters generados con DBSCAN </h5>
+<img height="600" src="reports/plots/clustering/dbscan/_2comps_.jpg" width="800"/>
+<h5>Datos agrupados por posiciones </h5>
+<img height="600" src="reports/plots/clustering/dbscan/_PositionGrouped_2comps_.jpg" width="800"/>
+<br><br>
+Ahora vemos los resultados utilizando 3 componentes principales.
+Optimizando estos dos parámetros usando el V-score obtenemos que el mejor par es esp=0.3 y min_samples=250.
+El número de clusters obtenidos es 3, y el número de observaciones cosidradas ruido es 3498.
+<br>
+Se obtienen estas métricas:
+* **Homogeneity: 0.447**
+* **Completeness: 0.433**
+* **V-measure: 0.440**
+* **Adjusted Rand Index: 0.356**
+* **Adjusted Mutual Information: 0.440**
+
+Ahora vemos los clusters generados:
+<img height="600" src="reports/plots/clustering/dbscan/_3comps_.jpg" width="800"/>
+<img height="600" src="reports/plots/clustering/dbscan/_PositionGrouped_3comps_.jpg" width="800"/>

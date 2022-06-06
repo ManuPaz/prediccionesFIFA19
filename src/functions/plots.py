@@ -5,9 +5,9 @@ from pandas import DataFrame
 import pandas as pd
 from sklearn.decomposition import PCA
 
-def plot_heat_map(cm,nombre_dir:str, title, xlabel, ylabel):
+def plot_heat_map(cm,nombre_file:str, title, xlabel, ylabel):
     figure, ax = plt.subplots()
-
+    cm = cm.T.drop_duplicates().T
     im = ax.imshow(cm, cmap=plt.get_cmap("cool"))
     ax.set_xticks(np.arange(len(cm.columns)), labels=cm.columns)
     plt.setp(ax.get_xticklabels(), rotation=90, ha="right", rotation_mode="anchor")
@@ -22,7 +22,7 @@ def plot_heat_map(cm,nombre_dir:str, title, xlabel, ylabel):
             if cm.loc[l, k] != 0:
                 ax.text(j, i, cm.loc[l, k], ha="center", va="center", color="black", fontsize=6)
 
-    figure.savefig(nombre_dir + "_heat_map.jpg")
+    figure.savefig(nombre_file)
 
     plt.show()
 
@@ -58,7 +58,8 @@ def pca_con_plots(df:pd.DataFrame,n_comps:int, nombre_dir:str):
 
 
 
-def plot_scatter_2d_with_classes(dataframe:pd.DataFrame,centroides:list,nombre_archivo:str=None,position_clusters:dict =None,girar=False):
+def plot_scatter_2d_with_classes(dataframe:pd.DataFrame,centroides:list=None,nombre_archivo:str=None,position_clusters:dict =None,girar=False,
+                                 asignar_posiciones=True):
     """
     Para hacer scatter plot 2D con colores que sean las categorias y puntos que en este caso son los centroides
 
@@ -70,20 +71,28 @@ def plot_scatter_2d_with_classes(dataframe:pd.DataFrame,centroides:list,nombre_a
     """
     fig = plt.figure()
 
-    if  position_clusters is not None:
+    if  position_clusters is not None and asignar_posiciones:
         position_clusters_inv = {e: i for i, e in position_clusters.items()}
         dataframe.loc[:,dataframe.columns[2]]=dataframe.iloc[:,2].transform(lambda x:position_clusters[x])
+    else:
+        dic={e:i   for i,e in enumerate (dataframe.iloc[:, 2].unique()) }
+        dataframe.loc[:, dataframe.columns[2]] = dataframe.iloc[:, 2].transform(lambda x: dic[x])
+        position_clusters_inv = {e: i for i, e in dic.items()}
 
     ax = plt.scatter(dataframe.iloc[:, 0], dataframe.iloc[:, 1], c=dataframe.iloc[:, 2])
 
     legend = ax.legend_elements()
-    if    position_clusters is not None:
+    if    position_clusters_inv is not None :
         for i,e in position_clusters_inv.items():
             legend [1][i]=e
+    for i in range(len(legend[1])):
+        if legend[1][i] == -1:
+            legend[1][i] ="ruido"
 
     plt.legend(*legend)
-    plt.scatter(centroides[:, 0], centroides[:, 1], s=200, marker='x',
-                     color='black')  # Centroides
+    if centroides is not None:
+        plt.scatter(centroides[:, 0], centroides[:, 1], s=200, marker='x',
+                         color='black')  # Centroides
     plt.xlabel(dataframe.columns[0])
     plt.ylabel(dataframe.columns[1])
 
@@ -92,8 +101,8 @@ def plot_scatter_2d_with_classes(dataframe:pd.DataFrame,centroides:list,nombre_a
     if nombre_archivo is not None:
         fig.savefig(nombre_archivo)
 
-def plot_scatter_3d_with_classes(dataframe:pd.DataFrame,centroides:list,nombre_archivo:str=None,
-                                 position_clusters:dict =None,girar=False):
+def plot_scatter_3d_with_classes(dataframe:pd.DataFrame,centroides:list=None,nombre_archivo:str=None,
+                                 position_clusters:dict =None,girar=False,asignar_posiciones=True):
     """
 
 
@@ -106,9 +115,13 @@ def plot_scatter_3d_with_classes(dataframe:pd.DataFrame,centroides:list,nombre_a
 
     fig = plt.figure()
     threedee = fig.add_subplot(projection='3d')
-    if  position_clusters is not None:
+    if  position_clusters is not None and asignar_posiciones:
         position_clusters_inv = {e: i for i, e in position_clusters.items()}
         dataframe.loc[:,dataframe.columns[3]]=dataframe.iloc[:,3].transform(lambda x:position_clusters[x])
+    else:
+        dic = {e: i for i, e in enumerate(dataframe.iloc[:, 3].unique())}
+        dataframe.loc[:, dataframe.columns[3]] = dataframe.iloc[:, 3].transform(lambda x: dic[x])
+        position_clusters_inv = {e: i for i, e in dic.items()}
     if girar is False:
         x=0
         y=1
@@ -120,12 +133,17 @@ def plot_scatter_3d_with_classes(dataframe:pd.DataFrame,centroides:list,nombre_a
     ax=threedee.scatter(dataframe.iloc[:, x], dataframe.iloc[:, y], dataframe.iloc[:, z], c=dataframe.iloc[:, 3])
 
     legend=ax.legend_elements()
-    if    position_clusters is not None:
+    if    position_clusters_inv is not None :
         for i,e in position_clusters_inv.items():
             legend [1][i]=e
 
+    for i in range(len((legend[1]))):
+        if legend [1][i]==-1:
+            legend[1][i]="ruido"
+
     threedee.legend(*legend)
-    threedee.scatter(centroides[:, x], centroides[:, y],centroides[:, z],  marker='x', color='black')  # Centroides
+    if centroides is not None:
+        threedee.scatter(centroides[:, x], centroides[:, y],centroides[:, z],  marker='x', color='black')  # Centroides
     threedee.set_xlabel(dataframe.columns[x])
     threedee.set_ylabel(dataframe.columns[y])
     threedee.set_zlabel(dataframe.columns[z])
