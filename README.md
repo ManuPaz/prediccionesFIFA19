@@ -534,6 +534,7 @@ Mostramos ahora las métricas para  k=5, k=8  y para k=4 (el que se corresponde 
 <h3>DBSCAN</h3>
 Ahora veremos los grupos obtenidos utilizando DBSCAN. 
 Utilizando DBSCAN tenemos dos parámetros para optimizar: 
+
 * **esp** . La distancia mímina para considerar dos puntos vecinos. 
 * **min_samples** . El número mínimo de puntos para tener un centro de densidad.
 
@@ -559,8 +560,10 @@ Ahora vemos los clusters generados con DBSCAN.
 Ahora vemos los resultados utilizando 3 componentes principales.
 Optimizando estos dos parámetros usando el V-score obtenemos que el mejor par es esp=0.3 y min_samples=250.
 El número de clusters obtenidos es 3, y el número de observaciones cosidradas ruido es 3498.
+
 <br>
 Se obtienen estas métricas:
+
 * **Homogeneity: 0.447**
 * **Completeness: 0.433**
 * **V-measure: 0.440**
@@ -568,5 +571,7 @@ Se obtienen estas métricas:
 * **Adjusted Mutual Information: 0.440**
 
 Ahora vemos los clusters generados:
+<h5>Clusters generados con DBSCAN </h5>
 <img height="600" src="reports/plots/clustering/dbscan/_3comps_.jpg" width="800"/>
+<h5>Datos agrupados por posiciones </h5>
 <img height="600" src="reports/plots/clustering/dbscan/_PositionGrouped_3comps_.jpg" width="800"/>
