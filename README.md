@@ -573,5 +573,5 @@ Se obtienen estas métricas:
 Ahora vemos los clusters generados:
 <h5>Clusters generados con DBSCAN </h5>
 <img height="600" src="reports/plots/clustering/dbscan/_3comps_.jpg" width="800"/>
-<h5>Datos agrupados por posiciones </h5>
+<h5>Datos agrupados por posiciones  </h5>
 <img height="600" src="reports/plots/clustering/dbscan/_PositionGrouped_3comps_.jpg" width="800"/>
