@@ -138,7 +138,7 @@ def plot_scatter_3d_with_classes(dataframe:pd.DataFrame,centroides:list=None,nom
             legend [1][i]=e
 
     for i in range(len((legend[1]))):
-        if legend [1][i]==-1:
+        if legend[1][i]==-1:
             legend[1][i]="ruido"
 
     threedee.legend(*legend)
