@@ -551,11 +551,13 @@ Se obtienen estas métricas:
 * **Adjusted Rand Index: 0.320**
 * **Adjusted Mutual Information: 0.437**
 
-Ahora vemos los clusters generados con DBSCAN.
+Ahora vemos los clusters generados con DBSCAN, y la matriz de confusión.
 <h5>Clusters generados con DBSCAN </h5>
 <img height="600" src="reports/plots/clustering/dbscan/_2comps_.jpg" width="800"/>
 <h5>Datos agrupados por posiciones </h5>
 <img height="600" src="reports/plots/clustering/dbscan/_PositionGrouped_2comps_.jpg" width="800"/>
+<h5>Matriz de confusión   </h5>
+<img height="600" src="reports/plots/clustering/dbscan/heatmaps/_ncomps2.png" width="800"/>
 <br><br>
 Ahora vemos los resultados utilizando 3 componentes principales.
 Optimizando estos dos parámetros usando el V-score obtenemos que el mejor par es esp=0.3 y min_samples=250.
@@ -570,8 +572,10 @@ Se obtienen estas métricas:
 * **Adjusted Rand Index: 0.356**
 * **Adjusted Mutual Information: 0.440**
 
-Ahora vemos los clusters generados:
+Ahora vemos los clusters generados y la matrices de confusión:
 <h5>Clusters generados con DBSCAN </h5>
 <img height="600" src="reports/plots/clustering/dbscan/_3comps_.jpg" width="800"/>
 <h5>Datos agrupados por posiciones  </h5>
 <img height="600" src="reports/plots/clustering/dbscan/_PositionGrouped_3comps_.jpg" width="800"/>
+<h5>Matriz de confusión   </h5>
+<img height="600" src="reports/plots/clustering/dbscan/heatmaps/_ncomps3.png" width="800"/>

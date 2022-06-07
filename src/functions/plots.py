@@ -8,7 +8,8 @@ from sklearn.decomposition import PCA
 def plot_heat_map(cm,nombre_file:str, title, xlabel, ylabel):
     figure, ax = plt.subplots()
     cm = cm.T.drop_duplicates().T
-    im = ax.imshow(cm, cmap=plt.get_cmap("cool"))
+    cm.rename(columns={-1:"ruido"},inplace=True)
+    im = ax.imshow(cm.astype(float), cmap=plt.get_cmap("cool"))
     ax.set_xticks(np.arange(len(cm.columns)), labels=cm.columns)
     plt.setp(ax.get_xticklabels(), rotation=90, ha="right", rotation_mode="anchor")
     ax.set_yticks(np.arange(len(cm.index)), labels=cm.index)

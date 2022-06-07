@@ -1,20 +1,17 @@
 import matplotlib.pyplot as plt
-import pandas as pd
-from sklearn.cluster import KMeans,DBSCAN
 import numpy as np
-import seaborn as sns
-from scipy.spatial import distance
+import pandas as pd
 from sklearn import metrics
-import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans, DBSCAN
 from sklearn.preprocessing import StandardScaler
 
 
-def metrics_clustering(labels_true,labels):
-    homogeneity_score=metrics.homogeneity_score(labels_true, labels)
-    completeness=metrics.completeness_score(labels_true, labels)
+def metrics_clustering(labels_true, labels):
+    homogeneity_score = metrics.homogeneity_score(labels_true, labels)
+    completeness = metrics.completeness_score(labels_true, labels)
     v_measure = metrics.v_measure_score(labels_true, labels)
-    adjusted_rand_index=metrics.adjusted_rand_score(labels_true, labels)
-    adjusuted_mutual_info=metrics.adjusted_mutual_info_score(labels_true, labels)
+    adjusted_rand_index = metrics.adjusted_rand_score(labels_true, labels)
+    adjusuted_mutual_info = metrics.adjusted_mutual_info_score(labels_true, labels)
     print("Homogeneity: %0.3f" % homogeneity_score)
     print("Completeness: %0.3f" % completeness)
     print("V-measure: %0.3f" % v_measure)
@@ -23,16 +20,16 @@ def metrics_clustering(labels_true,labels):
         "Adjusted Mutual Information: %0.3f"
         % adjusuted_mutual_info
     )
-    return {"Homogeneity":homogeneity_score,
-    "Completeness":    completeness,
-    "V-measure":v_measure ,
-    "Adjusted Rand Index": adjusted_rand_index,
-    "Adjusted Mutual Information": adjusuted_mutual_info,
-     }
+    return {"Homogeneity": homogeneity_score,
+            "Completeness": completeness,
+            "V-measure": v_measure,
+            "Adjusted Rand Index": adjusted_rand_index,
+            "Adjusted Mutual Information": adjusuted_mutual_info,
+            }
 
 
-
-def k_vs_metric(k_minimo: int, k_maximo:int, costes:list, nombre_archivo:str=None, title:str= "Disminucion del coste"):
+def k_vs_metric(k_minimo: int, k_maximo: int, costes: list, nombre_archivo: str = None,
+                title: str = "Disminucion del coste"):
     """
     Dibuja el plot del para seleccionar k usando el método del codo
 
@@ -42,8 +39,8 @@ def k_vs_metric(k_minimo: int, k_maximo:int, costes:list, nombre_archivo:str=Non
     :param costes: array de costes para cada k
     """
     fig = plt.figure()
-    ax=fig.add_subplot(111, projection='rectilinear')
-    ax.set_xticks(np.arange(len(costes)), labels=range(k_minimo,k_maximo+1))
+    ax = fig.add_subplot(111, projection='rectilinear')
+    ax.set_xticks(np.arange(len(costes)), labels=range(k_minimo, k_maximo + 1))
     plt.plot(range(k_minimo, k_maximo + 1), costes, '--', color="green")
     plt.title(title)
     plt.xlabel("k")
@@ -53,8 +50,7 @@ def k_vs_metric(k_minimo: int, k_maximo:int, costes:list, nombre_archivo:str=Non
         fig.savefig(nombre_archivo)
 
 
-
-def optimize_dbscan(df: pd.DataFrame,posicion: np.ndarray or pd.Series, eps:list,min_samples:list):
+def optimize_dbscan(df: pd.DataFrame, posicion: np.ndarray or pd.Series, eps: list, min_samples: list):
     """
 
     :param df: dataframe
@@ -63,16 +59,16 @@ def optimize_dbscan(df: pd.DataFrame,posicion: np.ndarray or pd.Series, eps:list
     :param min_samples:  lista para optimizar min_samples de DBSCAN
     :return : diccionario con V-measure para cada valor
     """
-    resultados={}
+    resultados = {}
     for k in eps:
         for i in min_samples:
-            db=train_dbscan(df, k,i)
-            labels=db.labels_
-            resultados[(k,i)]=metrics_clustering(labels, posicion)["V-measure"]
+            db = train_dbscan(df, k, i)
+            labels = db.labels_
+            resultados[(k, i)] = metrics_clustering(labels, posicion)["V-measure"]
     return resultados
 
 
-def train_dbscan(df:pd.DataFrame,eps:float=0.3, min_samples:int=10):
+def train_dbscan(df: pd.DataFrame, eps: float = 0.3, min_samples: int = 10):
     """
 
     :param df: dataframe
@@ -81,7 +77,7 @@ def train_dbscan(df:pd.DataFrame,eps:float=0.3, min_samples:int=10):
     :return: DBSCAN fitted
     :rtype: DBSCAN
     """
-    #transformamos X para aplicar el parametros esp de manera uniforme para cualquier dataframe
+    # transformamos X para aplicar el parametros esp de manera uniforme para cualquier dataframe
     X = StandardScaler().fit_transform(df)
     db = DBSCAN(eps=eps, min_samples=min_samples).fit(X)
     core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
@@ -98,9 +94,7 @@ def train_dbscan(df:pd.DataFrame,eps:float=0.3, min_samples:int=10):
     return db
 
 
-
-
-def optimizar_k(k_min: int, k_max:int, df_transformed:pd.DataFrame, n_init:int, max_iter:int, posicion:np.array):
+def optimizar_k(k_min: int, k_max: int, df_transformed: pd.DataFrame, n_init: int, max_iter: int, posicion: np.array):
     """
     Entrena kmeans con multiples k y devuelve los costes y centroides.
 
@@ -114,27 +108,28 @@ def optimizar_k(k_min: int, k_max:int, df_transformed:pd.DataFrame, n_init:int, 
     """
     costes_finales = []
     centroides_finales = []
-    metricas= {"Homogeneity": [],
-            "Completeness": [],
-            "V-measure": [],
-            "Adjusted Rand Index": [],
-            "Adjusted Mutual Information": []
-            }
+    metricas = {"Homogeneity": [],
+                "Completeness": [],
+                "V-measure": [],
+                "Adjusted Rand Index": [],
+                "Adjusted Mutual Information": []
+                }
     for k in range(k_min, k_max + 1):
         print(k)
         model, coste, centroides = train_k_means(k, df_transformed, inicio="random", n_init=n_init,
-                                                                      max_iter=max_iter)
+                                                 max_iter=max_iter)
         costes_finales.append(coste)
         centroides_finales.append(centroides)
 
-        labels=model.labels_
-        metrics_k=metrics_clustering(df_transformed,labels,posicion)
+        labels = model.labels_
+        metrics_k = metrics_clustering(df_transformed, labels, posicion)
         for e in metricas.keys():
             metricas[e].append(metrics_k[e])
 
-    return costes_finales,centroides_finales,metricas
+    return costes_finales, centroides_finales, metricas
 
-def train_k_means(num_clusters:int,df:pd.DataFrame, inicio:str="random", n_init:int=100, max_iter=100 ):
+
+def train_k_means(num_clusters: int, df: pd.DataFrame, inicio: str = "random", n_init: int = 100, max_iter=100):
     """
     Entrena kmeans para un k y unos parametros concretos.
 
@@ -149,17 +144,13 @@ def train_k_means(num_clusters:int,df:pd.DataFrame, inicio:str="random", n_init:
                    max_iter=max_iter)
 
     agrupamento = model.fit(df)
-    coste=(agrupamento.inertia_ / (df.shape[0]))
+    coste = (agrupamento.inertia_ / (df.shape[0]))
     centroides = agrupamento.cluster_centers_
 
-    return model,coste,centroides
+    return model, coste, centroides
 
 
-
-
-
-
-def asignar_centroides_a_clusters(df: pd.DataFrame, centroides: list, uno_a_uno:bool =True):
+def asignar_centroides_a_clusters(df: pd.DataFrame, centroides: list, uno_a_uno: bool = True):
     """
     Asigna cada posicion al cluster donde hay mas muestras de esa posicion
 
@@ -170,23 +161,17 @@ def asignar_centroides_a_clusters(df: pd.DataFrame, centroides: list, uno_a_uno:
     :return: diccionario con el cluster para cada posicion
     :rtype: dict
     """
-    df_grouped = df.groupby(["position","cluster"]).count()
-    posiciones_clusters={}
+    df_grouped = df.groupby(["position", "cluster"]).count()
+    posiciones_clusters = {}
     for posicion in df_grouped.index.get_level_values(0).unique():
 
-        minimo=df_grouped.loc[posicion].groupby("cluster").max().idxmax().comp1
+        minimo = df_grouped.loc[posicion].groupby("cluster").max().idxmax().comp1
         if not uno_a_uno:
-            posiciones_clusters[posicion]=minimo
+            posiciones_clusters[posicion] = minimo
         else:
-            df_aux=df_grouped.loc[posicion].groupby("cluster").max()
-            while(minimo in posiciones_clusters.values()):
-
-
-                df_aux.drop(minimo,inplace=True)
-                minimo =  df_aux.idxmax().comp1
+            df_aux = df_grouped.loc[posicion].groupby("cluster").max()
+            while (minimo in posiciones_clusters.values()):
+                df_aux.drop(minimo, inplace=True)
+                minimo = df_aux.idxmax().comp1
             posiciones_clusters[posicion] = minimo
     return posiciones_clusters
-
-
-
-
